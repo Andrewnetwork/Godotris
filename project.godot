@@ -11,8 +11,14 @@ config_version=5
 [application]
 
 config/name="Tetris"
+run/main_scene="uid://c8tfeab3iqj17"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=500
+window/size/viewport_height=800
 
 [rendering]
 

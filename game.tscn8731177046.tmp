@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://bslujay8bjeg0"]
+
+[ext_resource type="Script" uid="uid://bfp7vyvrkqy4g" path="res://Script/RandomSpriteGrid.gd" id="1_80nbo"]
+[ext_resource type="Texture2D" uid="uid://bbmpe0c61a8e2" path="res://Sprite/white_square.jpg" id="2_e2o6t"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="WhiteSquare" type="Sprite2D" parent="."]
+position = Vector2(251.5, 426.25)
+scale = Vector2(8.41, 10.035)
+texture = ExtResource("2_e2o6t")
+
+[node name="RandomSpriteGrid" type="Node2D" parent="."]
+script = ExtResource("1_80nbo")
+width = 50
+height = 80
+
+[node name="Godotris" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(254, 274)
+scale = Vector2(0.894366, 0.894366)
+texture = ExtResource("2_e2o6t")
