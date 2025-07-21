@@ -4,8 +4,8 @@
 [ext_resource type="Script" uid="uid://b55a60dekqq8q" path="res://Classes/Grid2D.gd" id="1_nbu7d"]
 [ext_resource type="Texture2D" uid="uid://bbmpe0c61a8e2" path="res://Sprite/white_square.jpg" id="2_6vf64"]
 [ext_resource type="Shader" uid="uid://o4uob7co1i3r" path="res://Shaders/tetrino_cell.gdshader" id="2_a0mqw"]
-[ext_resource type="Shader" uid="uid://krdmegslhcx8" path="res://crt.gdshader" id="3_pt2ix"]
-[ext_resource type="Shader" uid="uid://crf5wbpldvhi" path="res://hrv_colorwheel.gdshader" id="4_23bm3"]
+[ext_resource type="Shader" uid="uid://krdmegslhcx8" path="res://Shaders/crt.gdshader" id="3_pt2ix"]
+[ext_resource type="Shader" uid="uid://crf5wbpldvhi" path="res://Shaders/hrv_colorwheel.gdshader" id="4_23bm3"]
 [ext_resource type="Texture2D" uid="uid://djmybdegco63e" path="res://icon.svg" id="8_pt2ix"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_pt2ix"]
@@ -79,7 +79,6 @@ texture = ExtResource("2_6vf64")
 [node name="Grid2D" type="Node2D" parent="."]
 position = Vector2(100, 100)
 script = ExtResource("1_nbu7d")
-cell_size = Vector2(25, 25)
 grid_size = Vector2(16, 24)
 grid_color = Color(0.501961, 0.501961, 0.501961, 0.360784)
 background_color = Color(0, 0, 0, 1)

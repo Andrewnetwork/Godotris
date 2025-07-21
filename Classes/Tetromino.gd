@@ -14,7 +14,7 @@ const tetromino_definition = {
 }
 
 var type : TetrominoType
-var size : Vector2 
+var cell_size : Vector2 
 var move_flag : MoveType = MoveType.STILL
 var is_frozen = false
 
@@ -40,13 +40,13 @@ func _create():
 				sprite.material = ShaderMaterial.new()
 				sprite.material.shader = load("res://Shaders/tetrino_cell.gdshader")
 				sprite.texture = ImageTexture.create_from_image(img)
-				sprite.scale = size
-				sprite.position.x = column*size.x
-				sprite.position.y = row*size.y
+				sprite.scale = cell_size
+				sprite.position.x = column*cell_size.x
+				sprite.position.y = row*cell_size.y
 				# Add collsion shape. 
 				var rect_shape = RectangleShape2D.new()
 				# Make the collision shape a bit smaller so objects can be closer. 
-				rect_shape.size = Vector2(size.x - 1, size.y - 0.05) 
+				rect_shape.size = Vector2(cell_size.x-5, cell_size.y-5) 
 				var collision_rect = CollisionShape2D.new()
 				collision_rect.shape = rect_shape
 				collision_rect.position = sprite.position
@@ -55,9 +55,9 @@ func _create():
 				add_child(collision_rect)
 				
 	
-func _init(size = Vector2(25.0,25.0), type:TetrominoType=Tetromino.TetrominoType.values()[randi_range(0,6)]):
+func _init(cell_size = Vector2(25.0,25.0), type:TetrominoType=Tetromino.TetrominoType.values()[randi_range(0,6)]):
 	self.type = type
-	self.size = size	
+	self.cell_size = cell_size	
 	_create()
 
 # Character movement functions. 
@@ -82,19 +82,21 @@ func _physics_process(delta: float):
 			MoveType.STILL:
 				pass
 			MoveType.DOWN:
-				if move_and_collide(Vector2(0, size.y)) != null:
+				position.y += cell_size.y
+				if move_and_collide(Vector2(0, cell_size.y), true) != null:
 					is_frozen = true
 				move_flag = MoveType.STILL	 
 			MoveType.LEFT:
-				if move_and_collide(Vector2(-size.x, 0)) != null:
-					pass
+				if move_and_collide(Vector2(-cell_size.x, 0), true) == null:
+					position.x -= cell_size.x
 				move_flag = MoveType.STILL	 
 			MoveType.RIGHT:
-				if move_and_collide(Vector2(size.x, 0)) != null:
-					pass
+				if move_and_collide(Vector2(cell_size.x, 0), true) == null:
+					position.x += cell_size.x
 				move_flag = MoveType.STILL 
 			MoveType.DROP:
-				# TODO: fix this so we can teleport to the bottom. 
-				if move_and_collide(Vector2(0, size.y)) != null:
+				# TODO: fix this so we can teleport to the bottom.
+				position.y += cell_size.y
+				if move_and_collide(Vector2(0, cell_size.y), true) != null:
 					move_flag = MoveType.STILL	 
 					is_frozen = true

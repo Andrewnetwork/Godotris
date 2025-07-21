@@ -1,9 +1,9 @@
 [gd_scene load_steps=7 format=3 uid="uid://bslujay8bjeg0"]
 
-[ext_resource type="Script" uid="uid://qpfkdasxpdci" path="res://Intro.gd" id="1_33sem"]
-[ext_resource type="Shader" uid="uid://crf5wbpldvhi" path="res://hrv_colorwheel.gdshader" id="2_46ak0"]
+[ext_resource type="Script" uid="uid://qpfkdasxpdci" path="res://_scrap/Intro.gd" id="1_33sem"]
+[ext_resource type="Shader" uid="uid://crf5wbpldvhi" path="res://Shaders/hrv_colorwheel.gdshader" id="2_46ak0"]
 [ext_resource type="Texture2D" uid="uid://vjugehbpt6fd" path="res://Sprite/godotris.png" id="3_iysgs"]
-[ext_resource type="Shader" uid="uid://krdmegslhcx8" path="res://crt.gdshader" id="4_1rpvy"]
+[ext_resource type="Shader" uid="uid://krdmegslhcx8" path="res://Shaders/crt.gdshader" id="4_1rpvy"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_fc0e3"]
 shader = ExtResource("2_46ak0")

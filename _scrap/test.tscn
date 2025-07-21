@@ -1,9 +1,9 @@
 [gd_scene load_steps=5 format=3 uid="uid://drjh7rlocopc7"]
 
-[ext_resource type="Script" uid="uid://dj8ofqdi8in3j" path="res://test.gd" id="1_ykrsh"]
+[ext_resource type="Script" uid="uid://dj8ofqdi8in3j" path="res://_scrap/test.gd" id="1_ykrsh"]
 [ext_resource type="Texture2D" uid="uid://23oc4qyumuq7" path="res://Textures/I.jpg" id="2_8uh7m"]
 [ext_resource type="Script" uid="uid://fiq2mnexqt8x" path="res://Classes/Tetromino.gd" id="3_6uqi0"]
-[ext_resource type="Script" uid="uid://dbuqodfstwo4k" path="res://rocket.gd" id="3_ppyta"]
+[ext_resource type="Script" uid="uid://dbuqodfstwo4k" path="res://_scrap/rocket.gd" id="3_ppyta"]
 
 [node name="Test" type="Node2D"]
 script = ExtResource("1_ykrsh")

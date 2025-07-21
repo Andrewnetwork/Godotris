@@ -4,10 +4,6 @@ var player_tetromino = Tetromino.new(Vector2(25,25))
 	
 func _ready():
 	$Grid2D.add_item(player_tetromino, Vector2(0,8))
-	
-	var static_tetromino = Tetromino.new(Vector2(25,25))
-	static_tetromino.is_frozen = true
-	$Grid2D.add_item(static_tetromino, Vector2(10,8))
 
 func _process(delta: float):
 	timer += delta
@@ -20,6 +16,3 @@ func _process(delta: float):
 		# New piece to move. 
 		player_tetromino = Tetromino.new(Vector2(25,25))
 		$Grid2D.add_item(player_tetromino, Vector2(0,8))
-		
-		
-	

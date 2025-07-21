@@ -1,7 +1,8 @@
+@tool
 class_name Grid2D
 extends Node2D
 
-@export var cell_size: Vector2 = Vector2(32, 32)
+@export var cell_size: Vector2 = Vector2(25, 25)
 @export var grid_size: Vector2 = Vector2(20, 15)
 @export var grid_color: Color = Color(0.5, 0.5, 0.5)
 @export var background_color : Color = Color(1.0,1.0,1.0,0.0)
@@ -11,9 +12,8 @@ func add_item(grid_item: Node2D, center_cell: Vector2):
 	grid_item.position = Vector2(center_cell.y*cell_size.y-cell_size.y/2.0, center_cell.x*cell_size.x+cell_size.x/2.0)
 	grid_items.append(grid_item)
 	add_child(grid_item)
-func move_item(grid_item: Node2D, new_center_cell: Vector2, move_callback: Callable = func(): pass):
+func move_item(grid_item: Node2D, new_center_cell: Vector2):
 	grid_item.position = Vector2(new_center_cell.y*cell_size.y-cell_size.y/2.0, new_center_cell.x*cell_size.x+cell_size.x/2.0)
-	move_callback.call()
 func _draw():
 	# Background
 	draw_rect(Rect2(Vector2(0.0, 0.0), 
