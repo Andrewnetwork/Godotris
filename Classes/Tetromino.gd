@@ -1,6 +1,7 @@
 class_name Tetromino
-extends RigidBody2D
+extends CharacterBody2D
 
+enum MoveType {DOWN, LEFT, RIGHT, STILL, DROP}
 enum TetrominoType {I, O, T, S, Z, J, L}
 const tetromino_definition = {
 	TetrominoType.I: {"block_mask":[1,1,1,1], "n_rows":1, "n_cols":4, "color": Color.CYAN},
@@ -11,8 +12,11 @@ const tetromino_definition = {
 	TetrominoType.Z: {"block_mask":[1,1,0,0,1,1], "n_rows":2, "n_cols":3, "color": Color.RED},
 	TetrominoType.L: {"block_mask":[0,0,1,1,1,1], "n_rows":2, "n_cols":3, "color": Color.ORANGE}
 }
-@export var type : TetrominoType
-@export var size : Vector2 
+
+var type : TetrominoType
+var size : Vector2 
+var move_flag : MoveType = MoveType.STILL
+var is_frozen = false
 
 func _create():
 	var n_rows = tetromino_definition[type]["n_rows"]
@@ -42,7 +46,7 @@ func _create():
 				# Add collsion shape. 
 				var rect_shape = RectangleShape2D.new()
 				# Make the collision shape a bit smaller so objects can be closer. 
-				rect_shape.size = Vector2(size.x - 0.05, size.y - 0.05) 
+				rect_shape.size = Vector2(size.x - 1, size.y - 0.05) 
 				var collision_rect = CollisionShape2D.new()
 				collision_rect.shape = rect_shape
 				collision_rect.position = sprite.position
@@ -54,8 +58,43 @@ func _create():
 func _init(size = Vector2(25.0,25.0), type:TetrominoType=Tetromino.TetrominoType.values()[randi_range(0,6)]):
 	self.type = type
 	self.size = size	
-	freeze_mode = RigidBody2D.FreezeMode.FREEZE_MODE_KINEMATIC
-	contact_monitor = true
-	max_contacts_reported = 4
-	set_deferred("freeze", true)
 	_create()
+
+# Character movement functions. 
+func _unhandled_input(event: InputEvent):
+	if event.is_action_pressed("ui_left"):
+		move(MoveType.LEFT)
+	elif event.is_action_pressed("ui_right"):
+		move(MoveType.RIGHT)
+	elif event.is_action_pressed("ui_down"):
+		move(MoveType.DOWN)
+	elif event.is_action_pressed("immediate_drop"):
+		move(MoveType.DROP)
+
+func move(move_type: MoveType):
+	# Disregard movement when dropping a piece. 
+	if move_flag != MoveType.DROP:
+		move_flag = move_type
+
+func _physics_process(delta: float):
+	if !is_frozen:
+		match move_flag:
+			MoveType.STILL:
+				pass
+			MoveType.DOWN:
+				if move_and_collide(Vector2(0, size.y)) != null:
+					is_frozen = true
+				move_flag = MoveType.STILL	 
+			MoveType.LEFT:
+				if move_and_collide(Vector2(-size.x, 0)) != null:
+					pass
+				move_flag = MoveType.STILL	 
+			MoveType.RIGHT:
+				if move_and_collide(Vector2(size.x, 0)) != null:
+					pass
+				move_flag = MoveType.STILL 
+			MoveType.DROP:
+				# TODO: fix this so we can teleport to the bottom. 
+				if move_and_collide(Vector2(0, size.y)) != null:
+					move_flag = MoveType.STILL	 
+					is_frozen = true
