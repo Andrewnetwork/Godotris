@@ -1,5 +1,5 @@
-class_name Tetromino
-extends RigidBody2D
+class_name ClassicTetromino
+extends Node2D
 
 enum TetrominoType {I, O, T, S, Z, J, L}
 const tetromino_definition = {
@@ -11,19 +11,13 @@ const tetromino_definition = {
 	TetrominoType.Z: {"block_mask":[1,1,0,0,1,1], "n_rows":2, "n_cols":3, "color": Color.RED},
 	TetrominoType.L: {"block_mask":[0,0,1,1,1,1], "n_rows":2, "n_cols":3, "color": Color.ORANGE}
 }
-@export var type : TetrominoType
-@export var size : Vector2 
+@export var type : TetrominoType 
+@export var size : Vector2 = Vector2(10,10) 
 
 func _create():
 	var n_rows = tetromino_definition[type]["n_rows"]
 	var n_cols = tetromino_definition[type]["n_cols"]
 	var block_mask = tetromino_definition[type]["block_mask"]
-	
-	# Clean up prior pieces.
-	if get_children().size() > 0:
-		for child in get_children():
-			remove_child(child)
-			child.queue_free()
 			
 	for row in range(n_rows):
 		for column in range(n_cols):
@@ -41,21 +35,19 @@ func _create():
 				sprite.position.y = row*size.y
 				# Add collsion shape. 
 				var rect_shape = RectangleShape2D.new()
-				# Make the collision shape a bit smaller so objects can be closer. 
-				rect_shape.size = Vector2(size.x - 0.05, size.y - 0.05) 
+				rect_shape.size = size
 				var collision_rect = CollisionShape2D.new()
 				collision_rect.shape = rect_shape
 				collision_rect.position = sprite.position
 				# Add sprite and collision shape to the parent rigid body. 
 				add_child(sprite)
 				add_child(collision_rect)
-				
+
 	
-func _init(size = Vector2(25.0,25.0), type:TetrominoType=Tetromino.TetrominoType.values()[randi_range(0,6)]):
+func _init(type:TetrominoType=Tetromino.TetrominoType.values()[randi_range(0,6)], size= Vector2(25,25) ):
 	self.type = type
-	self.size = size	
-	freeze_mode = RigidBody2D.FreezeMode.FREEZE_MODE_KINEMATIC
-	contact_monitor = true
-	max_contacts_reported = 4
-	set_deferred("freeze", true)
+	self.size = size
+
+func _ready():
 	_create()
+	 

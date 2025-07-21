@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://d4bx8ncknyfkt"]
+
+[ext_resource type="Script" uid="uid://f2i28dhyt4lk" path="res://Scenes/classic_game.gd" id="1_80dnd"]
+[ext_resource type="Script" uid="uid://b55a60dekqq8q" path="res://Classes/Grid2D.gd" id="1_nbu7d"]
+[ext_resource type="Script" uid="uid://fiq2mnexqt8x" path="res://Classes/Tetromino.gd" id="3_ygsac"]
+
+[node name="ClassicGame" type="Node2D"]
+script = ExtResource("1_80dnd")
+
+[node name="Grid2D" type="Node2D" parent="."]
+script = ExtResource("1_nbu7d")
+cell_size = Vector2(25, 32)
+grid_size = Vector2(24, 32)
+metadata/_custom_type_script = "uid://b55a60dekqq8q"
+
+[node name="Tetromino" type="RigidBody2D" parent="."]
+position = Vector2(13, 13)
+contact_monitor = true
+max_contacts_reported = 1
+script = ExtResource("3_ygsac")
+size = Vector2(25, 25)
+metadata/_custom_type_script = "uid://fiq2mnexqt8x"

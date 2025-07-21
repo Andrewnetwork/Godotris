@@ -1,18 +1,18 @@
 [gd_scene load_steps=7 format=3 uid="uid://bslujay8bjeg0"]
 
-[ext_resource type="Shader" uid="uid://crf5wbpldvhi" path="res://hrv_colorwheel.gdshader" id="1_7jktm"]
-[ext_resource type="Script" uid="uid://qpfkdasxpdci" path="res://game.gd" id="1_fc0e3"]
-[ext_resource type="Texture2D" uid="uid://vjugehbpt6fd" path="res://Sprite/godotris.png" id="3_feb5d"]
-[ext_resource type="Shader" uid="uid://krdmegslhcx8" path="res://crt.gdshader" id="5_7jktm"]
+[ext_resource type="Script" uid="uid://qpfkdasxpdci" path="res://Intro.gd" id="1_33sem"]
+[ext_resource type="Shader" uid="uid://crf5wbpldvhi" path="res://hrv_colorwheel.gdshader" id="2_46ak0"]
+[ext_resource type="Texture2D" uid="uid://vjugehbpt6fd" path="res://Sprite/godotris.png" id="3_iysgs"]
+[ext_resource type="Shader" uid="uid://krdmegslhcx8" path="res://crt.gdshader" id="4_1rpvy"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_fc0e3"]
-shader = ExtResource("1_7jktm")
+shader = ExtResource("2_46ak0")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ryrav"]
-shader = ExtResource("5_7jktm")
+shader = ExtResource("4_1rpvy")
 
 [node name="Node2D" type="Node2D"]
-script = ExtResource("1_fc0e3")
+script = ExtResource("1_33sem")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 material = SubResource("ShaderMaterial_fc0e3")
@@ -23,7 +23,7 @@ offset_bottom = 800.0
 
 [node name="Godotris" type="Sprite2D" parent="."]
 position = Vector2(245, 408)
-texture = ExtResource("3_feb5d")
+texture = ExtResource("3_iysgs")
 
 [node name="ColorRect2" type="ColorRect" parent="."]
 material = SubResource("ShaderMaterial_ryrav")

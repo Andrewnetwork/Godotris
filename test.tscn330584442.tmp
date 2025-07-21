@@ -10,7 +10,7 @@ script = ExtResource("1_ykrsh")
 
 [node name="Floor" type="StaticBody2D" parent="."]
 position = Vector2(-168, -286)
-scale = Vector2(12.0444, 1.73712)
+scale = Vector2(3.86515, 1.49712)
 
 [node name="Sprite2D" type="Sprite2D" parent="Floor"]
 position = Vector2(272, 780)
@@ -22,36 +22,6 @@ position = Vector2(272, 780)
 scale = Vector2(107.375, 10.71)
 polygon = PackedVector2Array(-5, -5, -5, 5, 5, 5, 5, -5)
 
-[node name="Floor2" type="StaticBody2D" parent="."]
-position = Vector2(-4589, -2020)
-rotation = -1.57079
-scale = Vector2(51.1931, 2.05526)
-
-[node name="Sprite2D" type="Sprite2D" parent="Floor2"]
-position = Vector2(272, 780)
-scale = Vector2(107.375, 10.71)
-texture = ExtResource("2_8uh7m")
-
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Floor2"]
-position = Vector2(272, 780)
-scale = Vector2(107.375, 10.71)
-polygon = PackedVector2Array(-5, -5, -5, 5, 5, 5, 5, -5)
-
-[node name="Floor3" type="StaticBody2D" parent="."]
-position = Vector2(3000, -2020)
-rotation = -1.57079
-scale = Vector2(51.1931, 2.05526)
-
-[node name="Sprite2D" type="Sprite2D" parent="Floor3"]
-position = Vector2(272, 780)
-scale = Vector2(107.375, 10.71)
-texture = ExtResource("2_8uh7m")
-
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Floor3"]
-position = Vector2(272, 780)
-scale = Vector2(107.375, 10.71)
-polygon = PackedVector2Array(-5, -5, -5, 5, 5, 5, 5, -5)
-
 [node name="Rocket" type="RigidBody2D" parent="."]
 position = Vector2(421.425, 562.44)
 script = ExtResource("3_ppyta")
@@ -59,8 +29,6 @@ script = ExtResource("3_ppyta")
 [node name="Tetromino22" type="RigidBody2D" parent="Rocket"]
 position = Vector2(-112, -16)
 rotation = 1.57079
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
@@ -70,8 +38,6 @@ metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 
 [node name="Tetromino19" type="RigidBody2D" parent="Rocket"]
 position = Vector2(-80, -144)
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
@@ -82,8 +48,6 @@ metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 [node name="Tetromino21" type="RigidBody2D" parent="Rocket"]
 position = Vector2(144.59, -16)
 rotation = 1.57079
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
@@ -93,8 +57,6 @@ metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 
 [node name="Tetromino3" type="RigidBody2D" parent="Rocket"]
 position = Vector2(-80, 112)
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
@@ -104,8 +66,6 @@ metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 
 [node name="Tetromino5" type="RigidBody2D" parent="Rocket"]
 position = Vector2(48, 112)
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
@@ -115,8 +75,6 @@ metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 
 [node name="Tetromino13" type="RigidBody2D" parent="Rocket"]
 position = Vector2(-80, 48)
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
@@ -127,8 +85,6 @@ metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 [node name="Tetromino14" type="RigidBody2D" parent="Rocket"]
 position = Vector2(16, 80)
 rotation = 1.57079
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
@@ -139,8 +95,6 @@ metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 [node name="Tetromino17" type="RigidBody2D" parent="Rocket"]
 position = Vector2(-16, 112)
 rotation = -1.57079
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
@@ -151,8 +105,6 @@ metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 [node name="Tetromino23" type="RigidBody2D" parent="Rocket"]
 position = Vector2(16, -48)
 rotation = 1.57079
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
@@ -163,8 +115,6 @@ metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 [node name="Tetromino24" type="RigidBody2D" parent="Rocket"]
 position = Vector2(-16, -16)
 rotation = -1.57079
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
@@ -174,8 +124,6 @@ metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 
 [node name="Tetromino15" type="RigidBody2D" parent="Rocket"]
 position = Vector2(48, 48)
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
@@ -185,8 +133,6 @@ metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 
 [node name="Tetromino16" type="RigidBody2D" parent="Rocket"]
 position = Vector2(-80, -16)
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
@@ -196,8 +142,6 @@ metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 
 [node name="Tetromino25" type="RigidBody2D" parent="Rocket"]
 position = Vector2(-80, -80)
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
@@ -207,8 +151,6 @@ metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 
 [node name="Tetromino20" type="RigidBody2D" parent="Rocket"]
 position = Vector2(-32, -208)
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
@@ -218,8 +160,6 @@ metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 
 [node name="Tetromino18" type="RigidBody2D" parent="Rocket"]
 position = Vector2(48, -16)
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
@@ -229,8 +169,6 @@ metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 
 [node name="Tetromino26" type="RigidBody2D" parent="Rocket"]
 position = Vector2(48, -80)
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
@@ -240,25 +178,17 @@ metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 
 [node name="Thruster" type="RigidBody2D" parent="Rocket"]
 position = Vector2(-48, 176)
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
-type = 2
 size = Vector2(32, 32)
 metadata/_custom_type_script = "uid://fiq2mnexqt8x"
 
 [node name="Tetromino11" type="RigidBody2D" parent="Rocket"]
 position = Vector2(16, -144)
-freeze = true
-freeze_mode = 1
 contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("3_6uqi0")
 type = 4
 size = Vector2(32, 32)
 metadata/_custom_type_script = "uid://fiq2mnexqt8x"
-
-[node name="Camera2D" type="Camera2D" parent="Rocket"]
-zoom = Vector2(0.055, 0.055)
