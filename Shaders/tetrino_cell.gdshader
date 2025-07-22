@@ -16,16 +16,18 @@ void fragment() {
 	// Called for every pixel the material is visible on.
 	if(UV.x > 0.9 && UV.x-UV.y > 0.0 && UV.y+UV.x > 1.0){
 		// Right
-		COLOR.rgb -= 0.4;
+		COLOR.rgb += 0.4;
 	}else if(UV.x < 0.1 && UV.x-UV.y < 0.0 && UV.y+UV.x < 1.0){
 		// Left
-		COLOR.rgb -= 0.2;
+		COLOR.rgb += 0.4;
+		COLOR.a -= 0.2;
 	}else if(UV.y < 0.1){
 		// Top
-		COLOR.rgb -= 0.6;
+		COLOR.rgb += 0.4;
+		COLOR.a -= 0.2;
 	}else if(UV.y > 0.9){
 		// Bottom
-		COLOR.rgb -= 0.4;
+		COLOR.rgb += 0.4;
 	}else{
 		vec3 color = vec3(0.0);
 	    // Use polar coordinates instead of cartesian
