@@ -19,6 +19,7 @@ var move_flag : MoveType = MoveType.STILL
 var is_frozen = false
 var timer = 0
 var shadow : Node2D = Node2D.new()
+const hit_box_padding = 8.0
 
 func _create_shadow():
 	shadow.modulate.a = 0.5
@@ -54,7 +55,7 @@ func _create():
 				# Add collsion shape. 
 				var rect_shape = RectangleShape2D.new()
 				# Make the collision shape a bit smaller so objects can be closer. 
-				rect_shape.size = Vector2(cell_size.x-8, cell_size.y-8) 
+				rect_shape.size = Vector2(cell_size.x-hit_box_padding, cell_size.y-hit_box_padding) 
 				var collision_rect = CollisionShape2D.new()
 				collision_rect.shape = rect_shape
 				collision_rect.position = sprite.position
@@ -111,6 +112,7 @@ func _physics_process(delta: float):
 			MoveType.DOWN:
 				if move_and_collide(Vector2(0, cell_size.y), true) != null:
 					is_frozen = true
+					print(position)
 				else:
 					position.y += cell_size.y
 				move_flag = MoveType.STILL	 
@@ -123,36 +125,39 @@ func _physics_process(delta: float):
 					position.x += cell_size.x
 				move_flag = MoveType.STILL 
 			MoveType.DROP:
-				# TODO: fix magic number
 				var collision_data = move_and_collide(Vector2(0, 800), true)
 				if collision_data != null:
-					move_flag = MoveType.STILL	 
-					print("======")
+					# Get parent container of the tetromino--usually a grid. 
 					var parent_global_position = get_parent().global_position
-					# Position of the collider relative to the game grid. 
-					var collider_grid_position = collision_data.get_collider().global_position-parent_global_position
+					# The position of the collision is reported in global coordinates. Subtract 
+					# the parent's position to get the local position of the tetromino, i.e., 
+					# the position of the collision within the grid(tetromino parent). 
 					var collision_grid_position = collision_data.get_position()-parent_global_position
-					var collision_cell_position = collision_data.get_local_shape().position
-					var collision_cell_col_row= collision_cell_position / cell_size + Vector2.ONE
-					if collider_grid_position.y > 599:
-						#TODO: fix this hacky solution to colliding with the world boundary.
-						position.y = cell_size.y*(24-tetromino_definition[type].n_rows)+cell_size.y/2
-					else:
-						print("Parent global pos: "+str(parent_global_position))
-						print("Collider grid position: "+str(collider_grid_position))
-						print("Collision grid position: "+str(collision_grid_position))
-						print("Collision cell position: "+str(collision_cell_position))
-						print("Collision cell col_row: "+str(collision_cell_col_row))
-						var collision_row = ceil(collision_grid_position.y/cell_size.y)
-						print("Collides on row: "+str(collision_row))
-						# Drop to the row above the collision. Position as many rows up as
-						# it takes to accomidate the number of rows in the tetromino.
-						#tetromino_definition[type].n_rows
-						var new_cell_pos = collision_row-collision_cell_col_row.y
-						print("New row: "+str(new_cell_pos))
-						position.y = new_cell_pos*cell_size.y-cell_size.y/2
-						print("New position: "+str(position.y))
+					# Get the position of the cell within the tetromino that reports the collision. 
+					# This is the bottom left most cell that reports a collision. This position is 
+					# in local coordinates, meaning it's relative to the tetromino's origin. 
+					# We also must apply the tetromino's rotation to the position because apparently
+					# it does not inherent the rotation of the parent for some strange reason?
+					var hit_cell_position = collision_data.get_local_shape().position.rotated(rotation)
+					# Add the tetromino's position to the hit cell position to get the position of
+					# the hit cell within the grid, i.e., the grid's origin becomes the new origin.
+					var hit_cell_grid_position = position+hit_cell_position
+					# The y-distance between where the collision occured and the cell of the tetromino
+					# that was hit. 
+					var collision_y_distance = collision_grid_position.y-hit_cell_grid_position.y
+					# Account for the hitbox padding. 
+					# TODO: fix this hacky situation.
+					var hit_box_padding_offset = hit_box_padding*2
+					if collision_data.get_collider() is StaticBody2D:
+						# Collision with world boundary. It doesn't have hitbox padding. 
+						hit_box_padding_offset -= hit_box_padding
+					var block_collision_y_distance = collision_y_distance - hit_box_padding_offset
+					# Adjust the y-position.Stave off precision errors by making the move 
+					# a multiple of the cell height.
+					position.y += floor(block_collision_y_distance/cell_size.y)*cell_size.y
+					# Set the flags to prevent further movement of this piece. 
 					is_frozen = true
+					move_flag = MoveType.STILL	 
 				else:
 					position.y += cell_size.y
 			MoveType.UP:

@@ -84,12 +84,6 @@ grid_color = Color(0.501961, 0.501961, 0.501961, 0.360784)
 background_color = Color(0, 0, 0, 1)
 metadata/_custom_type_script = "uid://b55a60dekqq8q"
 
-[node name="StaticBody2D" type="StaticBody2D" parent="."]
-position = Vector2(302.645, 699.49)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
-shape = SubResource("WorldBoundaryShape2D_23bm3")
-
 [node name="TopBoundary" type="StaticBody2D" parent="."]
 position = Vector2(303, 97)
 rotation = -3.14159
