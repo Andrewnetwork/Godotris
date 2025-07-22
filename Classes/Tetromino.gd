@@ -65,9 +65,9 @@ func _create():
 				shadow.add_child(sprite.duplicate())
 				
 	
-func _init(cell_size = Vector2(25.0,25.0), type:TetrominoType=Tetromino.TetrominoType.values()[randi_range(0,6)]):
-	self.type = type
-	self.cell_size = cell_size	
+func _init(cell_size_cr = Vector2(25.0,25.0), tetromino_type:TetrominoType=Tetromino.TetrominoType.values()[randi_range(0,6)]):
+	type = tetromino_type
+	cell_size = cell_size_cr
 	_create()
 
 func _ready():
@@ -90,8 +90,38 @@ func _unhandled_input(event: InputEvent):
 func move(move_type: MoveType):
 	# Disregard movement when dropping a piece. 
 	if move_flag != MoveType.DROP:
-		move_flag = move_type
-
+		move_flag = move_type	
+func get_drop_pos():
+	#TODO fix magic number 1000. Need to figure out way of getting parent's height.
+	var collision_data = move_and_collide(Vector2(0, 1000), true)
+	# Get parent container of the tetromino--usually a grid. 
+	var parent_global_position = get_parent().global_position
+	# The position of the collision is reported in global coordinates. Subtract 
+	# the parent's position to get the local position of the tetromino, i.e., 
+	# the position of the collision within the grid(tetromino parent). 
+	var collision_grid_position = collision_data.get_position()-parent_global_position
+	# Get the position of the cell within the tetromino that reports the collision. 
+	# This is the bottom left most cell that reports a collision. This position is 
+	# in local coordinates, meaning it's relative to the tetromino's origin. 
+	# We also must apply the tetromino's rotation to the position because apparently
+	# it does not inherent the rotation of the parent for some strange reason?
+	var hit_cell_position = collision_data.get_local_shape().position.rotated(rotation)
+	# Add the tetromino's position to the hit cell position to get the position of
+	# the hit cell within the grid, i.e., the grid's origin becomes the new origin.
+	var hit_cell_grid_position = position+hit_cell_position
+	# The y-distance between where the collision occured and the cell of the tetromino
+	# that was hit. 
+	var collision_distance = collision_grid_position-hit_cell_grid_position
+	# Account for the hitbox padding. 
+	# TODO: fix this hacky situation.
+	var hit_box_padding_offset = hit_box_padding*2
+	if collision_data.get_collider() is StaticBody2D:
+		# Collision with world boundary. It doesn't have hitbox padding. 
+		hit_box_padding_offset -= hit_box_padding
+	var block_collision_distance = collision_distance - Vector2(hit_box_padding_offset, hit_box_padding_offset)
+	# Adjust the y-position.Stave off precision errors by making the move 
+	# a multiple of the cell height.
+	return floor(block_collision_distance/cell_size)*cell_size
 func _physics_process(delta: float):
 	timer += delta 
 	if Input.is_physical_key_pressed(KEY_LEFT) && timer > 0.05:
@@ -125,41 +155,10 @@ func _physics_process(delta: float):
 					position.x += cell_size.x
 				move_flag = MoveType.STILL 
 			MoveType.DROP:
-				var collision_data = move_and_collide(Vector2(0, 800), true)
-				if collision_data != null:
-					# Get parent container of the tetromino--usually a grid. 
-					var parent_global_position = get_parent().global_position
-					# The position of the collision is reported in global coordinates. Subtract 
-					# the parent's position to get the local position of the tetromino, i.e., 
-					# the position of the collision within the grid(tetromino parent). 
-					var collision_grid_position = collision_data.get_position()-parent_global_position
-					# Get the position of the cell within the tetromino that reports the collision. 
-					# This is the bottom left most cell that reports a collision. This position is 
-					# in local coordinates, meaning it's relative to the tetromino's origin. 
-					# We also must apply the tetromino's rotation to the position because apparently
-					# it does not inherent the rotation of the parent for some strange reason?
-					var hit_cell_position = collision_data.get_local_shape().position.rotated(rotation)
-					# Add the tetromino's position to the hit cell position to get the position of
-					# the hit cell within the grid, i.e., the grid's origin becomes the new origin.
-					var hit_cell_grid_position = position+hit_cell_position
-					# The y-distance between where the collision occured and the cell of the tetromino
-					# that was hit. 
-					var collision_y_distance = collision_grid_position.y-hit_cell_grid_position.y
-					# Account for the hitbox padding. 
-					# TODO: fix this hacky situation.
-					var hit_box_padding_offset = hit_box_padding*2
-					if collision_data.get_collider() is StaticBody2D:
-						# Collision with world boundary. It doesn't have hitbox padding. 
-						hit_box_padding_offset -= hit_box_padding
-					var block_collision_y_distance = collision_y_distance - hit_box_padding_offset
-					# Adjust the y-position.Stave off precision errors by making the move 
-					# a multiple of the cell height.
-					position.y += floor(block_collision_y_distance/cell_size.y)*cell_size.y
-					# Set the flags to prevent further movement of this piece. 
-					is_frozen = true
-					move_flag = MoveType.STILL	 
-				else:
-					position.y += cell_size.y
+				position.y += get_drop_pos().y
+				# Set the flags to prevent further movement of this piece. 
+				is_frozen = true
+				move_flag = MoveType.STILL	 
 			MoveType.UP:
 				# TODO: fix out of bounds rotation
 				rotate(deg_to_rad(90))
