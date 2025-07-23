@@ -21,12 +21,21 @@ var timer = 0
 var shadow : Node2D = Node2D.new()
 const hit_box_padding = 8.0
 
-func _create_shadow():
+func _stage_shadow():
 	shadow.modulate.a = 0.5
 	get_parent().add_child(shadow)
 	
 func _update_shadow():
-	pass
+	var drop_pos = get_drop_pos()
+	if drop_pos != Vector2.ZERO:
+		#TODO figure out error in x position
+		shadow.position.y = get_drop_pos().y+position.y
+		shadow.position.x = position.x 
+		
+	if shadow.get_parent() == null:
+		# Shadow has not been added to the scene tree yet. 
+		_stage_shadow()
+		
 func _create():
 	var n_rows = tetromino_definition[type]["n_rows"]
 	var n_cols = tetromino_definition[type]["n_cols"]
@@ -69,11 +78,6 @@ func _init(cell_size_cr = Vector2(25.0,25.0), tetromino_type:TetrominoType=Tetro
 	type = tetromino_type
 	cell_size = cell_size_cr
 	_create()
-
-func _ready():
-	#_create_shadow()
-	pass
-	
 # Character movement functions. 
 func _unhandled_input(event: InputEvent):
 	if event.is_action_pressed("ui_left"):
@@ -94,34 +98,40 @@ func move(move_type: MoveType):
 func get_drop_pos():
 	#TODO fix magic number 1000. Need to figure out way of getting parent's height.
 	var collision_data = move_and_collide(Vector2(0, 1000), true)
-	# Get parent container of the tetromino--usually a grid. 
-	var parent_global_position = get_parent().global_position
-	# The position of the collision is reported in global coordinates. Subtract 
-	# the parent's position to get the local position of the tetromino, i.e., 
-	# the position of the collision within the grid(tetromino parent). 
-	var collision_grid_position = collision_data.get_position()-parent_global_position
-	# Get the position of the cell within the tetromino that reports the collision. 
-	# This is the bottom left most cell that reports a collision. This position is 
-	# in local coordinates, meaning it's relative to the tetromino's origin. 
-	# We also must apply the tetromino's rotation to the position because apparently
-	# it does not inherent the rotation of the parent for some strange reason?
-	var hit_cell_position = collision_data.get_local_shape().position.rotated(rotation)
-	# Add the tetromino's position to the hit cell position to get the position of
-	# the hit cell within the grid, i.e., the grid's origin becomes the new origin.
-	var hit_cell_grid_position = position+hit_cell_position
-	# The y-distance between where the collision occured and the cell of the tetromino
-	# that was hit. 
-	var collision_distance = collision_grid_position-hit_cell_grid_position
-	# Account for the hitbox padding. 
-	# TODO: fix this hacky situation.
-	var hit_box_padding_offset = hit_box_padding*2
-	if collision_data.get_collider() is StaticBody2D:
-		# Collision with world boundary. It doesn't have hitbox padding. 
-		hit_box_padding_offset -= hit_box_padding
-	var block_collision_distance = collision_distance - Vector2(hit_box_padding_offset, hit_box_padding_offset)
-	# Adjust the y-position.Stave off precision errors by making the move 
-	# a multiple of the cell height.
-	return floor(block_collision_distance/cell_size)*cell_size
+	if collision_data != null:
+		# Get parent container of the tetromino--usually a grid. 
+		var parent_global_position = get_parent().global_position
+		# The position of the collision is reported in global coordinates. Subtract 
+		# the parent's position to get the local position of the tetromino, i.e., 
+		# the position of the collision within the grid(tetromino parent). 
+		var collision_grid_position = collision_data.get_position()-parent_global_position
+		# Get the position of the cell within the tetromino that reports the collision. 
+		# This is the bottom left most cell that reports a collision. This position is 
+		# in local coordinates, meaning it's relative to the tetromino's origin. 
+		# We also must apply the tetromino's rotation to the position because apparently
+		# it does not inherent the rotation of the parent for some strange reason?
+		var hit_cell_position = collision_data.get_local_shape().position.rotated(rotation)
+		# Add the tetromino's position to the hit cell position to get the position of
+		# the hit cell within the grid, i.e., the grid's origin becomes the new origin.
+		var hit_cell_grid_position = position+hit_cell_position
+		# The y-distance between where the collision occured and the cell of the tetromino
+		# that was hit. 
+		var collision_distance = collision_grid_position-hit_cell_grid_position
+		# Account for the hitbox padding. 
+		# TODO: fix this hacky situation.
+		var hit_box_padding_offset = hit_box_padding*2
+		if collision_data.get_collider() is StaticBody2D:
+			# Collision with world boundary. It doesn't have hitbox padding. 
+			hit_box_padding_offset -= hit_box_padding
+		var block_collision_distance = collision_distance - Vector2(hit_box_padding_offset, hit_box_padding_offset)
+		# Adjust the y-position.Stave off precision errors by making the move 
+		# a multiple of the cell height.
+		return floor(block_collision_distance/cell_size)*cell_size
+	else:
+		#push_error("No collision when updating shadow! There should always be a collision.")
+		print("error")
+		return Vector2.ZERO
+		
 func _physics_process(delta: float):
 	timer += delta 
 	if Input.is_physical_key_pressed(KEY_LEFT) && timer > 0.05:
@@ -142,7 +152,6 @@ func _physics_process(delta: float):
 			MoveType.DOWN:
 				if move_and_collide(Vector2(0, cell_size.y), true) != null:
 					is_frozen = true
-					print(position)
 				else:
 					position.y += cell_size.y
 				move_flag = MoveType.STILL	 
@@ -162,19 +171,12 @@ func _physics_process(delta: float):
 			MoveType.UP:
 				# TODO: fix out of bounds rotation
 				rotate(deg_to_rad(90))
-				#shadow.rotate(deg_to_rad(90))
+				shadow.rotate(deg_to_rad(90))
 				move_flag = MoveType.STILL 
-	
-	#if !is_frozen:
-		##Now that we've finished updating the location, update the shadow.
-		#var collision_data = move_and_collide(Vector2(0, 800), true) 
-		#if collision_data != null:
-			##print(collision_data.get_collider().position.y)
-			##print(position.y)
-			#shadow.position.y = collision_data.get_collider().position.y-cell_size.y*2
-			#shadow.position.x = position.x
-			##move_flag = MoveType.STILL
-			##is_frozen = true
-	#else:
-		#if is_instance_valid(shadow):
-			#shadow.queue_free()
+	#Now that we've finished updating the location, update the shadow.
+	if !is_frozen:
+		_update_shadow()
+	else:
+		# If this tetromino has been frozen in place, queue its shadow for deletion.
+		if is_instance_valid(shadow):
+			shadow.queue_free()
