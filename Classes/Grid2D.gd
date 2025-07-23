@@ -13,7 +13,9 @@ func _ready():
 	#[pos, normal]
 	#bottom, top, left, right
 	# TODO: finish boundaries
-	var boundary_positions = [[Vector2(0,grid_size.y*cell_size.y), Vector2.UP]]
+	var boundary_positions = [[Vector2(0,grid_size.y*cell_size.y), Vector2.UP], 
+		[Vector2(0,0), Vector2.DOWN], [Vector2(0,0), Vector2.RIGHT], 
+		[Vector2(grid_size.x*cell_size.x,0), Vector2.LEFT]]
 	
 	for boundary_position in boundary_positions:
 		var static_body = StaticBody2D.new()
