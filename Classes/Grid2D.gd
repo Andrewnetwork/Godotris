@@ -11,8 +11,6 @@ var grid_boundaries : Array[StaticBody2D]
 
 func _ready():
 	#[pos, normal]
-	#bottom, top, left, right
-	# TODO: finish boundaries
 	var boundary_positions = [[Vector2(0,grid_size.y*cell_size.y), Vector2.UP], 
 		[Vector2(0,0), Vector2.DOWN], [Vector2(0,0), Vector2.RIGHT], 
 		[Vector2(grid_size.x*cell_size.x,0), Vector2.LEFT]]
@@ -27,7 +25,6 @@ func _ready():
 		static_body.add_child(world_boundary)
 		grid_boundaries.append(static_body)
 		add_child(static_body)
-	
 func add_item(grid_item: Node2D, center_cell: Vector2):
 	grid_item.position = Vector2(center_cell.y*cell_size.y-cell_size.y/2.0, center_cell.x*cell_size.x+cell_size.x/2.0)
 	grid_items.append(grid_item)
@@ -39,13 +36,11 @@ func _draw():
 	draw_rect(Rect2(Vector2(0.0, 0.0), 
 		Vector2(cell_size.x * grid_size.x, cell_size.y * grid_size.y) ),
 			background_color)
-			
 	# Vertical lines
 	for x in range(grid_size.x + 1):
 		var start = Vector2(x * cell_size.x, 0)
 		var end = Vector2(x * cell_size.x, grid_size.y * cell_size.y)
 		draw_line(start, end, grid_color)
-
 	# Horizontal lines
 	for y in range(grid_size.y + 1):
 		var start = Vector2(0.0, y * cell_size.y)

@@ -19,7 +19,10 @@ var move_flag : MoveType = MoveType.STILL
 var is_frozen = false
 var timer = 0
 var shadow : Node2D = Node2D.new()
+var collision_shapes : Array[CollisionShape2D]
 const hit_box_padding = 8.0
+var bounding_box : Area2D = Area2D.new()
+var rotation_collisions : Array[Node2D]
 
 func _stage_shadow():
 	shadow.modulate.a = 0.5
@@ -35,21 +38,26 @@ func _update_shadow():
 	if shadow.get_parent() == null:
 		# Shadow has not been added to the scene tree yet. 
 		_stage_shadow()
-		
+	
 func _create():
+	# Data defining the tetromino.
 	var n_rows = tetromino_definition[type]["n_rows"]
 	var n_cols = tetromino_definition[type]["n_cols"]
 	var block_mask = tetromino_definition[type]["block_mask"]
 	
-	# Clean up prior pieces.
-	if get_children().size() > 0:
-		for child in get_children():
-			remove_child(child)
-			child.queue_free()
-			
+	# A bounding box area for the whole tetromino. 
+	var bounding_box_rect = RectangleShape2D.new()
+	bounding_box_rect.set_size(Vector2(cell_size.x*n_cols-hit_box_padding, cell_size.y*n_rows-hit_box_padding))
+	var bounding_box_shape = CollisionShape2D.new()
+	bounding_box_shape.shape = bounding_box_rect
+	bounding_box_shape.position = (bounding_box_rect.size/2)-Vector2.ONE*(hit_box_padding*3/2)
+	bounding_box.add_child(bounding_box_shape)
+	add_child(bounding_box)
+
 	for row in range(n_rows):
 		for column in range(n_cols):
-			if block_mask[row*n_cols + column]:
+			var index = row*n_cols + column
+			if block_mask[index]:
 				# Create a 1x1 image and fill it with the color of the tetromino.
 				var img = Image.create(1,1,false, Image.FORMAT_RGBA8)
 				img.fill(tetromino_definition[type]["color"])
@@ -61,6 +69,7 @@ func _create():
 				sprite.scale = cell_size
 				sprite.position.x = column*cell_size.x
 				sprite.position.y = row*cell_size.y
+	
 				# Add collsion shape. 
 				var rect_shape = RectangleShape2D.new()
 				# Make the collision shape a bit smaller so objects can be closer. 
@@ -68,15 +77,17 @@ func _create():
 				var collision_rect = CollisionShape2D.new()
 				collision_rect.shape = rect_shape
 				collision_rect.position = sprite.position
+				collision_shapes.append(collision_rect)
 				# Add sprite and collision shape to the parent rigid body. 
 				add_child(sprite)
 				add_child(collision_rect)
 				shadow.add_child(sprite.duplicate())
-				
-	
+
+
 func _init(cell_size_cr = Vector2(25.0,25.0), tetromino_type:TetrominoType=Tetromino.TetrominoType.values()[randi_range(0,6)]):
 	type = tetromino_type
 	cell_size = cell_size_cr
+	bounding_box.monitoring = true
 	_create()
 # Character movement functions. 
 func _unhandled_input(event: InputEvent):
@@ -131,7 +142,25 @@ func get_drop_pos():
 		#push_error("No collision when updating shadow! There should always be a collision.")
 		print("error")
 		return Vector2.ZERO
-		
+	
+	
+func safe_rotate():
+	# Rotate the bounding box to test for rotation collisions. 
+	bounding_box.rotate(deg_to_rad(90))
+	# Wait for all physics calculations to be completed before checking
+	# for collisions with bounding box. 
+	await get_tree().physics_frame
+	# Get all of the bodies colliding with the bounding box. 
+	rotation_collisions = bounding_box.get_overlapping_bodies()
+	# Remove the tetromino, which is within the bounding box. 
+	rotation_collisions.erase(self)
+	# If there are no collisions, rotate the tetromino and its drop shadow. 
+	if len(rotation_collisions) == 0:
+		rotate(deg_to_rad(90))
+		shadow.rotate(deg_to_rad(90))
+	# Undo the collision check rotation of the bounding box. 
+	bounding_box.rotate(deg_to_rad(-90))
+	
 func _physics_process(delta: float):
 	timer += delta 
 	if Input.is_physical_key_pressed(KEY_LEFT) && timer > 0.05:
@@ -169,9 +198,9 @@ func _physics_process(delta: float):
 				is_frozen = true
 				move_flag = MoveType.STILL	 
 			MoveType.UP:
-				# TODO: fix out of bounds rotation
-				rotate(deg_to_rad(90))
-				shadow.rotate(deg_to_rad(90))
+				# Call def
+				
+				safe_rotate()
 				move_flag = MoveType.STILL 
 	#Now that we've finished updating the location, update the shadow.
 	if !is_frozen:

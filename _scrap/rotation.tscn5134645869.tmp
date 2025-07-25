@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://bh4vycuyqj37c"]
+
+[ext_resource type="Script" uid="uid://ckdohag3kxbbo" path="res://_scrap/rotation.gd" id="1_kmv87"]
+[ext_resource type="Texture2D" uid="uid://djmybdegco63e" path="res://icon.svg" id="2_6dp6n"]
+
+[node name="Rotation" type="Node2D"]
+script = ExtResource("1_kmv87")
+
+[node name="Icon" type="Sprite2D" parent="."]
+position = Vector2(280, 234)
+texture = ExtResource("2_6dp6n")
+
+[node name="Second" type="Sprite2D" parent="."]
+position = Vector2(280, 384)
+texture = ExtResource("2_6dp6n")
