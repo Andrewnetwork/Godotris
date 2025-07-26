@@ -1,4 +1,4 @@
-class_name Tetromino
+class_name PlayerTetromino
 extends CharacterBody2D
 
 enum MoveType {DOWN, LEFT, RIGHT, UP, STILL, DROP}
@@ -19,15 +19,14 @@ var move_flag : MoveType = MoveType.STILL
 var is_frozen = false
 var timer = 0
 var shadow : Node2D = Node2D.new()
-var collision_shapes : Array[CollisionShape2D]
+var cells : Array[TetrominoCell]
 const hit_box_padding = 8.0
 var bounding_box : Area2D = Area2D.new()
 var rotation_collisions : Array[Node2D]
 
 func _stage_shadow():
 	shadow.modulate.a = 0.5
-	get_parent().add_child(shadow)
-	
+	get_parent().add_child(shadow)	
 func _update_shadow():
 	var drop_pos = get_drop_pos()
 	if drop_pos != Vector2.ZERO:
@@ -38,7 +37,6 @@ func _update_shadow():
 	if shadow.get_parent() == null:
 		# Shadow has not been added to the scene tree yet. 
 		_stage_shadow()
-	
 func _create():
 	# Data defining the tetromino.
 	var n_rows = tetromino_definition[type]["n_rows"]
@@ -58,33 +56,12 @@ func _create():
 		for column in range(n_cols):
 			var index = row*n_cols + column
 			if block_mask[index]:
-				# Create a 1x1 image and fill it with the color of the tetromino.
-				var img = Image.create(1,1,false, Image.FORMAT_RGBA8)
-				img.fill(tetromino_definition[type]["color"])
-				# Create a sprite and texture it with the above image. 
-				var sprite = Sprite2D.new()
-				sprite.material = ShaderMaterial.new()
-				sprite.material.shader = load("res://Shaders/tetrino_cell.gdshader")
-				sprite.texture = ImageTexture.create_from_image(img)
-				sprite.scale = cell_size
-				sprite.position.x = column*cell_size.x
-				sprite.position.y = row*cell_size.y
-	
-				# Add collsion shape. 
-				var rect_shape = RectangleShape2D.new()
-				# Make the collision shape a bit smaller so objects can be closer. 
-				rect_shape.size = Vector2(cell_size.x-hit_box_padding, cell_size.y-hit_box_padding) 
-				var collision_rect = CollisionShape2D.new()
-				collision_rect.shape = rect_shape
-				collision_rect.position = sprite.position
-				collision_shapes.append(collision_rect)
-				# Add sprite and collision shape to the parent rigid body. 
-				add_child(sprite)
-				add_child(collision_rect)
-				shadow.add_child(sprite.duplicate())
-
-
-func _init(cell_size_cr = Vector2(25.0,25.0), tetromino_type:TetrominoType=Tetromino.TetrominoType.values()[randi_range(0,6)]):
+				var nt = TetrominoCell.new(tetromino_definition[type]["color"], cell_size, 
+					Vector2(column*cell_size.x, row*cell_size.y), hit_box_padding)
+				add_child(nt)
+				cells.append(nt)
+				shadow.add_child(nt.duplicate(false))
+func _init(cell_size_cr = Vector2(25.0,25.0), tetromino_type:TetrominoType=PlayerTetromino.TetrominoType.values()[randi_range(0,6)]):
 	type = tetromino_type
 	cell_size = cell_size_cr
 	bounding_box.monitoring = true
@@ -101,7 +78,6 @@ func _unhandled_input(event: InputEvent):
 		move(MoveType.DROP)
 	elif event.is_action_pressed("ui_up"):
 		move(MoveType.UP)
-
 func move(move_type: MoveType):
 	# Disregard movement when dropping a piece. 
 	if move_flag != MoveType.DROP:
@@ -142,8 +118,6 @@ func get_drop_pos():
 		#push_error("No collision when updating shadow! There should always be a collision.")
 		print("error")
 		return Vector2.ZERO
-	
-	
 func safe_rotate():
 	# Rotate the bounding box to test for rotation collisions. 
 	bounding_box.rotate(deg_to_rad(90))
@@ -159,8 +133,7 @@ func safe_rotate():
 		rotate(deg_to_rad(90))
 		shadow.rotate(deg_to_rad(90))
 	# Undo the collision check rotation of the bounding box. 
-	bounding_box.rotate(deg_to_rad(-90))
-	
+	bounding_box.rotate(deg_to_rad(-90))	
 func _physics_process(delta: float):
 	timer += delta 
 	if Input.is_physical_key_pressed(KEY_LEFT) && timer > 0.05:
@@ -172,7 +145,6 @@ func _physics_process(delta: float):
 	elif Input.is_physical_key_pressed(KEY_DOWN) && timer > 0.02:
 		move_flag = MoveType.DOWN
 		timer = 0
-		
 		
 	if !is_frozen:
 		match move_flag:
@@ -198,8 +170,6 @@ func _physics_process(delta: float):
 				is_frozen = true
 				move_flag = MoveType.STILL	 
 			MoveType.UP:
-				# Call def
-				
 				safe_rotate()
 				move_flag = MoveType.STILL 
 	#Now that we've finished updating the location, update the shadow.
@@ -209,3 +179,21 @@ func _physics_process(delta: float):
 		# If this tetromino has been frozen in place, queue its shadow for deletion.
 		if is_instance_valid(shadow):
 			shadow.queue_free()
+func dissolve():
+	## Dissolve the player tetromino into individual static body cells.
+	for cell in cells:
+		var rigid_cell = RigidBody2D.new()
+		var cell_duplicate = cell.duplicate(false)
+		cell_duplicate.position = position + cell_duplicate.position.rotated(rotation)
+		rigid_cell.add_child(cell_duplicate)
+		rigid_cell.freeze = true
+		rigid_cell.freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
+		get_parent().add_child(rigid_cell)
+	get_parent().remove_child(self)
+
+	queue_free()
+func place(place_position : Vector2 = self.position):
+	# Wait until the end of the physics frame to place the piece. 
+	position = place_position
+	is_frozen = true 
+	dissolve()
