@@ -1,4 +1,4 @@
-class_name TetrominoCell
+class_name TetrominoCellShape
 extends CollisionShape2D
 
 var sprite : Sprite2D

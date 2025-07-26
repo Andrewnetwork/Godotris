@@ -2,12 +2,13 @@ class_name TetrominoManager
 extends Node
 
 var timer = 0
-var player_tetromino = PlayerTetromino.new(Vector2(25,25))
 var game_grid : Grid2D
+var player_tetromino : PlayerTetromino
 var line_scanner : Area2D = Area2D.new()
 var line_areas : Array[LineArea]
 func _init(grid : Grid2D):
 	game_grid = grid
+	player_tetromino = PlayerTetromino.new(game_grid, Vector2(25,25))
 	game_grid.add_item(player_tetromino, Vector2(0,8))
 	create_line_areas()
 	
@@ -59,6 +60,6 @@ func _physics_process(delta: float):
 		register_placed_tetromino(player_tetromino)
 
 		# New piece to move. 
-		player_tetromino = PlayerTetromino.new(Vector2(25,25))
+		player_tetromino = PlayerTetromino.new(game_grid, Vector2(25,25))
 		game_grid.add_item(player_tetromino, Vector2(0,8))
 		

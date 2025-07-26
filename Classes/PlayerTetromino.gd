@@ -19,14 +19,15 @@ var move_flag : MoveType = MoveType.STILL
 var is_frozen = false
 var timer = 0
 var shadow : Node2D = Node2D.new()
-var cells : Array[TetrominoCell]
+var cells : Array[TetrominoCellShape]
 const hit_box_padding = 0.05
 var bounding_box : Area2D = Area2D.new()
 var rotation_collisions : Array[Node2D]
+var grid: Grid2D
 
 func _stage_shadow():
 	shadow.modulate.a = 0.5
-	get_parent().add_child(shadow)	
+	grid.add_child(shadow)	
 func _update_shadow():
 	var drop_pos = get_drop_pos()
 	if drop_pos != Vector2.ZERO:
@@ -56,15 +57,16 @@ func _create():
 		for column in range(n_cols):
 			var index = row*n_cols + column
 			if block_mask[index]:
-				var nt = TetrominoCell.new(tetromino_definition[type]["color"], cell_size, 
+				var nt = TetrominoCellShape.new(tetromino_definition[type]["color"], cell_size, 
 					Vector2(column*cell_size.x, row*cell_size.y), hit_box_padding)
 				add_child(nt)
 				cells.append(nt)
 				shadow.add_child(nt.duplicate(false))
-func _init(cell_size_cr = Vector2(25.0,25.0), tetromino_type:TetrominoType=PlayerTetromino.TetrominoType.values()[randi_range(0,6)]):
+func _init(game_grid: Grid2D, cell_size_cr = Vector2(25.0,25.0), tetromino_type:TetrominoType=PlayerTetromino.TetrominoType.values()[randi_range(0,6)]):
 	type = tetromino_type
 	cell_size = cell_size_cr
 	bounding_box.monitoring = true
+	grid = game_grid
 	_create()
 # Character movement functions. 
 func _unhandled_input(event: InputEvent):
@@ -87,7 +89,7 @@ func get_drop_pos():
 	var collision_data = move_and_collide(Vector2(0, 1000), true)
 	if collision_data != null:
 		# Get parent container of the tetromino--usually a grid. 
-		var parent_global_position = get_parent().global_position
+		var parent_global_position = grid.global_position
 		# The position of the collision is reported in global coordinates. Subtract 
 		# the parent's position to get the local position of the tetromino, i.e., 
 		# the position of the collision within the grid(tetromino parent). 
@@ -181,21 +183,15 @@ func _physics_process(delta: float):
 			shadow.queue_free()
 func dissolve():
 	## Dissolve the player tetromino into individual static body cells.
-	var cell_psy_material = PhysicsMaterial.new()
-	cell_psy_material.friction = INF
-	
 	for cell in cells:
-		var rigid_cell = RigidBody2D.new()
-		rigid_cell.material = cell_psy_material
-		rigid_cell.mass = 10000
-		rigid_cell.lock_rotation = true
+		var rigid_cell = TetrominoCellBody.new(grid)
 		var cell_duplicate = cell.duplicate(false)
 		cell_duplicate.position = position + cell_duplicate.position.rotated(rotation)
 		rigid_cell.add_child(cell_duplicate)
 		rigid_cell.freeze = true
 		rigid_cell.freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
-		get_parent().add_child(rigid_cell)
-	get_parent().remove_child(self)
+		grid.add_child(rigid_cell)
+	grid.remove_child(self)
 
 	queue_free()
 func place(place_position : Vector2 = self.position) -> Array[int]:

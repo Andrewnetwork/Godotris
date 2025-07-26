@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://d4bx8ncknyfkt"]
+[gd_scene load_steps=12 format=3 uid="uid://d4bx8ncknyfkt"]
 
 [ext_resource type="Script" uid="uid://f2i28dhyt4lk" path="res://Scenes/classic_game.gd" id="1_80dnd"]
 [ext_resource type="Script" uid="uid://b55a60dekqq8q" path="res://Classes/Grid2D.gd" id="1_nbu7d"]
@@ -27,8 +27,6 @@ shader = ExtResource("3_pt2ix")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_23bm3"]
 shader = ExtResource("2_a0mqw")
-
-[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_23bm3"]
 
 [node name="ClassicGame" type="Node2D"]
 script = ExtResource("1_80dnd")
@@ -83,6 +81,3 @@ grid_size = Vector2(16, 24)
 grid_color = Color(0.501961, 0.501961, 0.501961, 0.360784)
 background_color = Color(0, 0, 0, 1)
 metadata/_custom_type_script = "uid://b55a60dekqq8q"
-
-[node name="RigidBody2D" type="RigidBody2D" parent="."]
-physics_material_override = SubResource("PhysicsMaterial_23bm3")
