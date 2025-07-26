@@ -20,7 +20,7 @@ var is_frozen = false
 var timer = 0
 var shadow : Node2D = Node2D.new()
 var cells : Array[TetrominoCell]
-const hit_box_padding = 8.0
+const hit_box_padding = 0.05
 var bounding_box : Area2D = Area2D.new()
 var rotation_collisions : Array[Node2D]
 
@@ -181,8 +181,14 @@ func _physics_process(delta: float):
 			shadow.queue_free()
 func dissolve():
 	## Dissolve the player tetromino into individual static body cells.
+	var cell_psy_material = PhysicsMaterial.new()
+	cell_psy_material.friction = INF
+	
 	for cell in cells:
 		var rigid_cell = RigidBody2D.new()
+		rigid_cell.material = cell_psy_material
+		rigid_cell.mass = 10000
+		rigid_cell.lock_rotation = true
 		var cell_duplicate = cell.duplicate(false)
 		cell_duplicate.position = position + cell_duplicate.position.rotated(rotation)
 		rigid_cell.add_child(cell_duplicate)
@@ -192,8 +198,15 @@ func dissolve():
 	get_parent().remove_child(self)
 
 	queue_free()
-func place(place_position : Vector2 = self.position):
-	# Wait until the end of the physics frame to place the piece. 
+func place(place_position : Vector2 = self.position) -> Array[int]:
+	## Place the tetromino, dissolve the character body, and return the index of the rows affected 
+	## by the placement. 
+	var rows_affected : Array[int] = []
+	for cell in cells:
+		var row_idx =  int(ceil((position.y+cell.position.rotated(rotation).y) / cell_size.y))-1
+		if not rows_affected.has(row_idx):
+			rows_affected.append(row_idx)
 	position = place_position
 	is_frozen = true 
 	dissolve()
+	return rows_affected

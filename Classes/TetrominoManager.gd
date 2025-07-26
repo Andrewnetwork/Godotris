@@ -13,9 +13,13 @@ func _init(grid : Grid2D):
 	
 
 func register_placed_tetromino(tetromino : PlayerTetromino):
-	player_tetromino.place()
-	line_clear_check(tetromino)
+	line_clear_check(player_tetromino.place())
 
+func turn_on_physics():
+	for child in game_grid.get_children():
+		if child is RigidBody2D:
+			child.freeze = false
+			
 func create_line_areas():
 	var line_rect = RectangleShape2D.new()
 	line_rect.set_size(Vector2(game_grid.cell_size.x*game_grid.grid_size.x-player_tetromino.hit_box_padding*2, 
@@ -31,16 +35,19 @@ func create_line_areas():
 		game_grid.add_child(line_area)
 		
 	
-func line_clear_check(initiator: PlayerTetromino):
+func line_clear_check(check_rows: Array[int]):
 	## Checks for line clears
 	await get_tree().physics_frame
 	#for cell in initiator.cells:
 		#print(ceil((cell.position.y+initiator.position.y) / game_grid.cell_size.y))
-	#for line_area in initiator.bounding_box.get_overlapping_areas():
-		#print(line_area.get_overlapping_bodies())
-	#
-	var scan_res = line_areas[23].get_overlapping_bodies()
-	print("Line:  "+str(scan_res))
+	for row_idx in check_rows:
+		var cells_in_line = line_areas[row_idx].get_overlapping_bodies()
+		if len(cells_in_line) == game_grid.grid_size.x:
+			for cell in cells_in_line:
+				cell.queue_free()
+				turn_on_physics()
+			
+	
 	
 func _physics_process(delta: float):
 	timer += delta
