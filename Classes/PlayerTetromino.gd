@@ -1,6 +1,8 @@
 class_name PlayerTetromino
 extends CharacterBody2D
 
+signal placed(rows_affected: Array[int])
+
 enum MoveType {DOWN, LEFT, RIGHT, UP, STILL, DROP}
 enum TetrominoType {I, O, T, S, Z, J, L}
 const tetromino_definition = {
@@ -38,7 +40,7 @@ func dissolve():
 		grid.add_child(rigid_cell)
 	grid.remove_child(self)
 	queue_free()
-func place(place_position : Vector2 = self.position) -> Array[int]:
+func place(place_position: Vector2 = self.position):
 	## Place the tetromino, dissolve the character body, and return the index of the rows affected 
 	## by the placement. 
 	var rows_affected : Array[int] = []
@@ -49,7 +51,7 @@ func place(place_position : Vector2 = self.position) -> Array[int]:
 	position = place_position
 	is_frozen = true 
 	dissolve()
-	return rows_affected
+	emit_signal("placed", rows_affected)
 # Setup
 func _create():
 	# Data defining the tetromino.
@@ -183,6 +185,7 @@ func _physics_process(delta: float):
 			MoveType.DOWN:
 				if move_and_collide(Vector2(0, cell_size.y), true) != null:
 					is_frozen = true
+					place()
 				else:
 					position.y += cell_size.y
 				move_flag = MoveType.STILL	 
@@ -196,6 +199,7 @@ func _physics_process(delta: float):
 				move_flag = MoveType.STILL 
 			MoveType.DROP:
 				position.y += get_drop_pos().y
+				place()
 				# Set the flags to prevent further movement of this piece. 
 				is_frozen = true
 				move_flag = MoveType.STILL	 
