@@ -24,6 +24,5 @@ func _physics_process(delta: float):
 		#$RigidBody2D.apply_torque(3000000)
 		pass
 
-
 func _on_area_2d_body_entered(body: Node2D) -> void:
 	print("Body entered")

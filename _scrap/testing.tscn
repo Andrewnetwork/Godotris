@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dn1b63g1kimom"]
 
-[ext_resource type="Script" uid="uid://xowj4keb6vr0" path="res://Scenes/testing.gd" id="1_siu27"]
+[ext_resource type="Script" uid="uid://xowj4keb6vr0" path="res://_scrap/testing.gd" id="1_siu27"]
 [ext_resource type="Texture2D" uid="uid://djmybdegco63e" path="res://icon.svg" id="2_sx6hp"]
 
 [node name="Testing" type="Node2D"]

@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://c72xb1atabf8r"]
 
-[ext_resource type="Script" uid="uid://s85fhd5ekd0j" path="res://Temp/collisions_and_rotations.gd" id="1_0fftp"]
+[ext_resource type="Script" uid="uid://s85fhd5ekd0j" path="res://_scrap/collisions_and_rotations.gd" id="1_0fftp"]
 [ext_resource type="Texture2D" uid="uid://djmybdegco63e" path="res://icon.svg" id="1_8bg46"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_0fftp"]
@@ -9,7 +9,7 @@ bounce = 1.0
 absorbent = true
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8bg46"]
-size = Vector2(228, 213)
+size = Vector2(72, 83.5)
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_8bg46"]
 distance = -522.0
@@ -82,7 +82,7 @@ position = Vector2(-7, 66)
 linear_damp = 0.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-position = Vector2(284, 269)
+position = Vector2(206, 204.25)
 shape = SubResource("RectangleShape2D_8bg46")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]

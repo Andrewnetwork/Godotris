@@ -1,8 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://d4bx8ncknyfkt"]
+[gd_scene load_steps=13 format=3 uid="uid://d4bx8ncknyfkt"]
 
 [ext_resource type="Script" uid="uid://f2i28dhyt4lk" path="res://Scenes/classic_game.gd" id="1_80dnd"]
-[ext_resource type="Script" uid="uid://b55a60dekqq8q" path="res://Classes/Grid2D.gd" id="1_nbu7d"]
-[ext_resource type="Texture2D" uid="uid://bbmpe0c61a8e2" path="res://Sprite/white_square.jpg" id="2_6vf64"]
+[ext_resource type="Script" uid="uid://b55a60dekqq8q" path="res://Classes/Grid.gd" id="1_nbu7d"]
 [ext_resource type="Shader" uid="uid://o4uob7co1i3r" path="res://Shaders/tetrino_cell.gdshader" id="2_a0mqw"]
 [ext_resource type="Shader" uid="uid://krdmegslhcx8" path="res://Shaders/crt.gdshader" id="3_pt2ix"]
 [ext_resource type="Shader" uid="uid://crf5wbpldvhi" path="res://Shaders/hrv_colorwheel.gdshader" id="4_23bm3"]
@@ -27,6 +26,15 @@ shader = ExtResource("3_pt2ix")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_23bm3"]
 shader = ExtResource("2_a0mqw")
+
+[sub_resource type="Gradient" id="Gradient_a0mqw"]
+colors = PackedColorArray(0.69217, 0.495391, 0.0152584, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_23bm3"]
+gradient = SubResource("Gradient_a0mqw")
+width = 63
+height = 42
+fill_from = Vector2(1, 1)
 
 [node name="ClassicGame" type="Node2D"]
 script = ExtResource("1_80dnd")
@@ -70,11 +78,11 @@ offset_bottom = 800.0
 [node name="GridBorder" type="Sprite2D" parent="."]
 modulate = Color(1, 0.239216, 0, 1)
 material = SubResource("ShaderMaterial_23bm3")
-position = Vector2(300, 400)
-scale = Vector2(4.091, 6.075)
-texture = ExtResource("2_6vf64")
+position = Vector2(299.5, 399.5)
+scale = Vector2(6.52381, 14.5476)
+texture = SubResource("GradientTexture2D_23bm3")
 
-[node name="Grid2D" type="Node2D" parent="."]
+[node name="Grid" type="Node2D" parent="."]
 position = Vector2(100, 100)
 script = ExtResource("1_nbu7d")
 grid_size = Vector2(16, 24)

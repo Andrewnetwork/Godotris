@@ -23,21 +23,34 @@ var cells : Array[TetrominoCellShape]
 const hit_box_padding = 0.05
 var bounding_box : Area2D = Area2D.new()
 var rotation_collisions : Array[Node2D]
-var grid: Grid2D
+var grid: Grid
 
-func _stage_shadow():
-	shadow.modulate.a = 0.5
-	grid.add_child(shadow)	
-func _update_shadow():
-	var drop_pos = get_drop_pos()
-	if drop_pos != Vector2.ZERO:
-		#TODO figure out error in x position
-		shadow.position.y = get_drop_pos().y+position.y
-		shadow.position.x = position.x 
-		
-	if shadow.get_parent() == null:
-		# Shadow has not been added to the scene tree yet. 
-		_stage_shadow()
+# Placement Functions
+func dissolve():
+	## Dissolve the player tetromino into individual static body cells.
+	for cell in cells:
+		var rigid_cell = TetrominoCellBody.new(grid)
+		var cell_duplicate = cell.duplicate(false)
+		cell_duplicate.position = position + cell_duplicate.position.rotated(rotation)
+		rigid_cell.add_child(cell_duplicate)
+		rigid_cell.freeze = true
+		rigid_cell.freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
+		grid.add_child(rigid_cell)
+	grid.remove_child(self)
+	queue_free()
+func place(place_position : Vector2 = self.position) -> Array[int]:
+	## Place the tetromino, dissolve the character body, and return the index of the rows affected 
+	## by the placement. 
+	var rows_affected : Array[int] = []
+	for cell in cells:
+		var row_idx =  int(ceil((position.y+cell.position.rotated(rotation).y) / cell_size.y))-1
+		if not rows_affected.has(row_idx):
+			rows_affected.append(row_idx)
+	position = place_position
+	is_frozen = true 
+	dissolve()
+	return rows_affected
+# Setup
 func _create():
 	# Data defining the tetromino.
 	var n_rows = tetromino_definition[type]["n_rows"]
@@ -62,28 +75,20 @@ func _create():
 				add_child(nt)
 				cells.append(nt)
 				shadow.add_child(nt.duplicate(false))
-func _init(game_grid: Grid2D, cell_size_cr = Vector2(25.0,25.0), tetromino_type:TetrominoType=PlayerTetromino.TetrominoType.values()[randi_range(0,6)]):
-	type = tetromino_type
-	cell_size = cell_size_cr
-	bounding_box.monitoring = true
-	grid = game_grid
-	_create()
-# Character movement functions. 
-func _unhandled_input(event: InputEvent):
-	if event.is_action_pressed("ui_left"):
-		move(MoveType.LEFT)
-	elif event.is_action_pressed("ui_right"):
-		move(MoveType.RIGHT)
-	elif event.is_action_pressed("ui_down"):
-		move(MoveType.DOWN)
-	elif event.is_action_pressed("immediate_drop"):
-		move(MoveType.DROP)
-	elif event.is_action_pressed("ui_up"):
-		move(MoveType.UP)
-func move(move_type: MoveType):
-	# Disregard movement when dropping a piece. 
-	if move_flag != MoveType.DROP:
-		move_flag = move_type	
+# Shadow Functions
+func _stage_shadow():
+	shadow.modulate.a = 0.5
+	grid.add_child(shadow)	
+func _update_shadow():
+	var drop_pos = get_drop_pos()
+	if drop_pos != Vector2.ZERO:
+		#TODO figure out error in x position
+		shadow.position.y = get_drop_pos().y+position.y
+		shadow.position.x = position.x 
+		
+	if shadow.get_parent() == null:
+		# Shadow has not been added to the scene tree yet. 
+		_stage_shadow()
 func get_drop_pos():
 	#TODO fix magic number 1000. Need to figure out way of getting parent's height.
 	var collision_data = move_and_collide(Vector2(0, 1000), true)
@@ -120,6 +125,11 @@ func get_drop_pos():
 		#push_error("No collision when updating shadow! There should always be a collision.")
 		print("error")
 		return Vector2.ZERO
+# Character Movement functions. 
+func move(move_type: MoveType):
+	# Disregard movement when dropping a piece. 
+	if move_flag != MoveType.DROP:
+		move_flag = move_type	
 func safe_rotate():
 	# Rotate the bounding box to test for rotation collisions. 
 	bounding_box.rotate(deg_to_rad(90))
@@ -136,6 +146,24 @@ func safe_rotate():
 		shadow.rotate(deg_to_rad(90))
 	# Undo the collision check rotation of the bounding box. 
 	bounding_box.rotate(deg_to_rad(-90))	
+# Overloaded Functions
+func _init(game_grid: Grid, tetromino_type:TetrominoType=PlayerTetromino.TetrominoType.values()[randi_range(0,6)]):
+	type = tetromino_type
+	cell_size = game_grid.cell_size
+	bounding_box.monitoring = true
+	grid = game_grid
+	_create()
+func _unhandled_input(event: InputEvent):
+	if event.is_action_pressed("ui_left"):
+		move(MoveType.LEFT)
+	elif event.is_action_pressed("ui_right"):
+		move(MoveType.RIGHT)
+	elif event.is_action_pressed("ui_down"):
+		move(MoveType.DOWN)
+	elif event.is_action_pressed("immediate_drop"):
+		move(MoveType.DROP)
+	elif event.is_action_pressed("ui_up"):
+		move(MoveType.UP)
 func _physics_process(delta: float):
 	timer += delta 
 	if Input.is_physical_key_pressed(KEY_LEFT) && timer > 0.05:
@@ -181,28 +209,3 @@ func _physics_process(delta: float):
 		# If this tetromino has been frozen in place, queue its shadow for deletion.
 		if is_instance_valid(shadow):
 			shadow.queue_free()
-func dissolve():
-	## Dissolve the player tetromino into individual static body cells.
-	for cell in cells:
-		var rigid_cell = TetrominoCellBody.new(grid)
-		var cell_duplicate = cell.duplicate(false)
-		cell_duplicate.position = position + cell_duplicate.position.rotated(rotation)
-		rigid_cell.add_child(cell_duplicate)
-		rigid_cell.freeze = true
-		rigid_cell.freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
-		grid.add_child(rigid_cell)
-	grid.remove_child(self)
-
-	queue_free()
-func place(place_position : Vector2 = self.position) -> Array[int]:
-	## Place the tetromino, dissolve the character body, and return the index of the rows affected 
-	## by the placement. 
-	var rows_affected : Array[int] = []
-	for cell in cells:
-		var row_idx =  int(ceil((position.y+cell.position.rotated(rotation).y) / cell_size.y))-1
-		if not rows_affected.has(row_idx):
-			rows_affected.append(row_idx)
-	position = place_position
-	is_frozen = true 
-	dissolve()
-	return rows_affected
