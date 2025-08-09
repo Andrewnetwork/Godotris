@@ -32,12 +32,11 @@ extends Node
 ## The tetromino actively being moved by the player. 
 var player_tetromino: PlayerTetromino
 ## Areas that detect pieces occupying lines. One for every line.
-var line_areas: Array[LineArea]
+var line_areas: Array[Area2D]
 # Internal counters.
 var n_lines_cleared := 0
 var round_tick_time := 1.0
 var round_tick_timer := 0.0
-
 
 func piece_placed(rows_affected: Array[int]):
 	await get_tree().physics_frame
@@ -108,7 +107,7 @@ func create_line_areas():
 		line_rect_cshape.shape = line_rect
 		line_rect_cshape.position = (line_rect.size/2)+Vector2.ONE*(player_tetromino.hit_box_padding)+Vector2(0, game_grid.cell_size.y * row)
 		# Create a new line area for the row and add it to the game grid.
-		var line_area = LineArea.new()
+		var line_area = Area2D.new()
 		line_area.add_child(line_rect_cshape)
 		line_areas.append(line_area)
 		game_grid.add_child(line_area)

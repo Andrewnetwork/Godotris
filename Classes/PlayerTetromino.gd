@@ -17,7 +17,7 @@ const tetromino_definition = {
 const hit_box_padding = 0.1
 
 var shadow : Node2D = Node2D.new()
-var cells : Array[TetrominoCellShape]
+var cells : Array[CollisionShape2D]
 var bounding_box : Area2D = Area2D.new()
 var rotation_collisions : Array[Node2D]
 
@@ -32,11 +32,33 @@ var key_down_speed : float
 var type : TetrominoType
 var cell_size : Vector2 
 
+func make_cell(color: Color, cell_position: Vector2):
+	var sprite := Sprite2D.new()
+	var c_shape := CollisionShape2D.new()
+	var img = Image.create(1,1,false, Image.FORMAT_RGBA8)
+	
+	img.fill(color)
+	# Create a sprite and texture it with the above image. 
+	sprite.material = ShaderMaterial.new()
+	sprite.material.shader = load("res://Shaders/tetrino_cell.gdshader")
+	sprite.texture = ImageTexture.create_from_image(img)
+	sprite.scale = cell_size
+ 	
+	# Add collsion shape. 
+	var rect_shape = RectangleShape2D.new()
+	# Make the collision shape a bit smaller so objects can be closer. 
+	rect_shape.size = Vector2(cell_size.x-hit_box_padding, cell_size.y-hit_box_padding) 
+
+	c_shape.shape = rect_shape
+	c_shape.position = cell_position
+
+	c_shape.add_child(sprite)
+	return c_shape
 # Placement Functions
 func dissolve():
 	## Dissolve the player tetromino into individual static body cells.
 	for cell in cells:
-		var rigid_cell = TetrominoCellBody.new(grid)
+		var rigid_cell = RigidBody2D.new()
 		var cell_duplicate = cell.duplicate(false)
 		cell_duplicate.position = position + cell_duplicate.position.rotated(rotation)
 		rigid_cell.add_child(cell_duplicate)
@@ -71,25 +93,26 @@ func _create():
 	var n_cols = tetromino_definition[type]["n_cols"]
 	var block_mask = tetromino_definition[type]["block_mask"]
 	
-	# A bounding box area for the whole tetromino. 
-	var bounding_box_rect = RectangleShape2D.new()
-	bounding_box_rect.set_size(Vector2(cell_size.x*n_cols-hit_box_padding, cell_size.y*n_rows-hit_box_padding))
-	var bounding_box_shape = CollisionShape2D.new()
-	bounding_box_shape.shape = bounding_box_rect
-	bounding_box_shape.position = (bounding_box_rect.size/2)-Vector2.ONE*(hit_box_padding*3/2)
-	bounding_box.add_child(bounding_box_shape)
-	add_child(bounding_box)
-	
 	var center_cell = Vector2(ceil(n_cols/2), ceil(n_rows/2))*cell_size
 	for row in range(n_rows):
 		for column in range(n_cols):
 			var index = row*n_cols + column
 			if block_mask[index]:
-				var nt = TetrominoCellShape.new(tetromino_definition[type]["color"], cell_size, 
-					Vector2(column*cell_size.x, row*cell_size.y)-center_cell, hit_box_padding)
+				var nt = make_cell(tetromino_definition[type]["color"], 
+					Vector2(column*cell_size.x, row*cell_size.y)-center_cell)
 				add_child(nt)
 				cells.append(nt)
 				shadow.add_child(nt.duplicate(false))
+		
+	# A bounding box area for the whole tetromino. 
+	var bounding_box_rect = RectangleShape2D.new()
+	bounding_box_rect.set_size(Vector2(cell_size.x*n_cols-hit_box_padding, cell_size.y*n_rows-hit_box_padding))
+	var bounding_box_shape = CollisionShape2D.new()
+	bounding_box_shape.shape = bounding_box_rect
+	bounding_box_shape.position -= Vector2(0, cell_size.y/2)
+	bounding_box.add_child(bounding_box_shape)
+	add_child(bounding_box)
+	
 func _ready():
 	_update_shadow()
 # Shadow Functions
