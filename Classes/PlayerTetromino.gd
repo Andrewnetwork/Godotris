@@ -115,11 +115,9 @@ func _stage_shadow():
 	grid.add_child(shadow)	
 func _update_shadow():
 	var drop_pos = await get_drop_pos()
-	if drop_pos != Vector2.ZERO:
-		#TODO figure out error in x position
+	if drop_pos != -Vector2.ONE:
 		shadow.position.y = drop_pos.y+position.y
 		shadow.position.x = position.x 
-	
 	if shadow.get_parent() == null:
 		# Shadow has not been added to the scene tree yet. 
 		_stage_shadow()
@@ -160,9 +158,9 @@ func get_drop_pos():
 		else:
 			#push_error("No collision when updating shadow! There should always be a collision.")
 			print("error")
-			return Vector2.ZERO
+			return -Vector2.ONE
 	else:
-		return Vector2.ZERO
+		return -Vector2.ONE
 # Character Movement 
 func move(move_flag: MoveType):
 	# Wait for all the physics to be processed before making a move.
