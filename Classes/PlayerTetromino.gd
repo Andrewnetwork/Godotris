@@ -124,78 +124,83 @@ func _update_shadow():
 func get_drop_pos():
 	if is_inside_tree():
 		await get_tree().physics_frame
-		#TODO fix magic number 1000. Need to figure out way of getting parent's height.
-		var collision_data = move_and_collide(Vector2(0, 1000), true)
-		if collision_data != null:
-			# Get parent container of the tetromino--usually a grid. 
-			var parent_global_position = grid.global_position
-			# The position of the collision is reported in global coordinates. Subtract 
-			# the parent's position to get the local position of the tetromino, i.e., 
-			# the position of the collision within the grid(tetromino parent). 
-			var collision_grid_position = collision_data.get_position()-parent_global_position
-			# Get the position of the cell within the tetromino that reports the collision. 
-			# This is the bottom left most cell that reports a collision. This position is 
-			# in local coordinates, meaning it's relative to the tetromino's origin. 
-			# We also must apply the tetromino's rotation to the position because apparently
-			# it does not inherent the rotation of the parent for some strange reason?
-			var hit_cell_position = collision_data.get_local_shape().position.rotated(rotation)
-			# Add the tetromino's position to the hit cell position to get the position of
-			# the hit cell within the grid, i.e., the grid's origin becomes the new origin.
-			var hit_cell_grid_position = position+hit_cell_position
-			# The y-distance between where the collision occured and the cell of the tetromino
-			# that was hit. 
-			var collision_distance = collision_grid_position-hit_cell_grid_position
-			# Account for the hitbox padding. 
-			# TODO: fix this hacky situation.
-			var hit_box_padding_offset = hit_box_padding*2
-			if collision_data.get_collider() is StaticBody2D:
-				# Collision with world boundary. It doesn't have hitbox padding. 
-				hit_box_padding_offset -= hit_box_padding
-			var block_collision_distance = collision_distance - Vector2(hit_box_padding_offset, hit_box_padding_offset)
-			# Adjust the y-position.Stave off precision errors by making the move 
-			# a multiple of the cell height.
-			return floor(block_collision_distance/cell_size)*cell_size
+		if !is_queued_for_deletion():
+			#TODO fix magic number 1000. Need to figure out way of getting parent's height.
+			var collision_data = move_and_collide(Vector2(0, 1000), true)
+			if collision_data != null:
+				# Get parent container of the tetromino--usually a grid. 
+				var parent_global_position = grid.global_position
+				# The position of the collision is reported in global coordinates. Subtract 
+				# the parent's position to get the local position of the tetromino, i.e., 
+				# the position of the collision within the grid(tetromino parent). 
+				var collision_grid_position = collision_data.get_position()-parent_global_position
+				# Get the position of the cell within the tetromino that reports the collision. 
+				# This is the bottom left most cell that reports a collision. This position is 
+				# in local coordinates, meaning it's relative to the tetromino's origin. 
+				# We also must apply the tetromino's rotation to the position because apparently
+				# it does not inherent the rotation of the parent for some strange reason?
+				var hit_cell_position = collision_data.get_local_shape().position.rotated(rotation)
+				# Add the tetromino's position to the hit cell position to get the position of
+				# the hit cell within the grid, i.e., the grid's origin becomes the new origin.
+				var hit_cell_grid_position = position+hit_cell_position
+				# The y-distance between where the collision occured and the cell of the tetromino
+				# that was hit. 
+				var collision_distance = collision_grid_position-hit_cell_grid_position
+				# Account for the hitbox padding. 
+				# TODO: fix this hacky situation.
+				var hit_box_padding_offset = hit_box_padding*2
+				if collision_data.get_collider() is StaticBody2D:
+					# Collision with world boundary. It doesn't have hitbox padding. 
+					hit_box_padding_offset -= hit_box_padding
+				var block_collision_distance = collision_distance - Vector2(hit_box_padding_offset, hit_box_padding_offset)
+				# Adjust the y-position.Stave off precision errors by making the move 
+				# a multiple of the cell height.
+				return floor(block_collision_distance/cell_size)*cell_size
+			else:
+				#push_error("No collision when updating shadow! There should always be a collision.")
+				print("error")
+				return -Vector2.ONE
 		else:
-			#push_error("No collision when updating shadow! There should always be a collision.")
-			print("error")
 			return -Vector2.ONE
 	else:
 		return -Vector2.ONE
 # Character Movement 
 func move(move_flag: MoveType):
 	# Wait for all the physics to be processed before making a move.
-	await get_tree().physics_frame
-	match move_flag:
-		MoveType.TICK_DOWN:
-			if move_and_collide(Vector2(0, cell_size.y), true) != null:
-				if key_down_timer != 0:
-					# A key is down and a force drop is initiated.
-					time_force_drop = true
-					if force_drop_timer >= drop_delay:
+	if is_inside_tree():
+		await get_tree().physics_frame
+		if !is_queued_for_deletion():
+			match move_flag:
+				MoveType.TICK_DOWN:
+					if move_and_collide(Vector2(0, cell_size.y), true) != null:
+						if key_down_timer != 0:
+							# A key is down and a force drop is initiated.
+							time_force_drop = true
+							if force_drop_timer >= drop_delay:
+								place()
+						else:
+							place()
+					else:
+						move_and_collide(Vector2(0, cell_size.y))
+				MoveType.DOWN:
+					if move_and_collide(Vector2(0, cell_size.y), true) != null:
 						place()
-				else:
+					else:
+						move_and_collide(Vector2(0, cell_size.y))
+				MoveType.LEFT:
+					if move_and_collide(Vector2(-cell_size.x, 0), true) == null:
+						position.x -= cell_size.x
+				MoveType.RIGHT:
+					if move_and_collide(Vector2(cell_size.x, 0), true) == null:
+						position.x += cell_size.x
+				MoveType.DROP:
+					var drop_pos = await get_drop_pos()
+					move_and_collide(Vector2(0, drop_pos.y))
 					place()
-			else:
-				move_and_collide(Vector2(0, cell_size.y))
-		MoveType.DOWN:
-			if move_and_collide(Vector2(0, cell_size.y), true) != null:
-				place()
-			else:
-				move_and_collide(Vector2(0, cell_size.y))
-		MoveType.LEFT:
-			if move_and_collide(Vector2(-cell_size.x, 0), true) == null:
-				position.x -= cell_size.x
-		MoveType.RIGHT:
-			if move_and_collide(Vector2(cell_size.x, 0), true) == null:
-				position.x += cell_size.x
-		MoveType.DROP:
-			var drop_pos = await get_drop_pos()
-			move_and_collide(Vector2(0, drop_pos.y))
-			place()
-		MoveType.UP:
-			safe_rotate()
-	#Now that we've finished updating the location, update the shadow.
-	_update_shadow()
+				MoveType.UP:
+					safe_rotate()
+			#Now that we've finished updating the location, update the shadow.
+			_update_shadow()
 func safe_rotate():
 	if type != TetrominoType.O:
 		# Rotate the bounding box to test for rotation collisions. 
