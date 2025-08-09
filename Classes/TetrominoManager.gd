@@ -1,37 +1,39 @@
 class_name TetrominoManager
 extends Node
 
-
-#==== UI Elements =====
-## Game grid where pieces are placed and moved. 
 @export_group("UI Elements")
+## Game grid where pieces are placed and moved. 
 @export var game_grid: Grid
+## Rich text label used to display the current round.
 @export var round_text: RichTextLabel
 
 @export_group("Gameplay Settings")
 ## Number of rounds in the game.
 @export var rounds := 10
-## How much the drop speed is increased per round. 
-@export var round_speed := 0.25
 ## How many line clears are required to advance to the next round.
 @export var round_clears := 10
+## Determines the speed of each round. The maximum domain should match the number of rounds in the game.
+## The minimum value is the fastest speed.
+@export var round_speed_curve : Curve = preload("res://Misc/default_round_speed_curve.tres")
+
 
 @export_subgroup("Movment Settings")
 ## Determines how fast a piece moves when the user holds down a control key.
 ## Reasonable values seem to be around 0.1.
 @export var key_down_speed := 0.1
+## The ammount of time in seconds before a drop is forced while moving a piece.
+@export var drop_delay := 2
 
 #==== Game Settings ====
 @export_group("Settings")
-## Current round.
+## Current round. The initial value represents at what round the game begins.
 @export var current_round := 1
-
-
 
 ## The tetromino actively being moved by the player. 
 var player_tetromino: PlayerTetromino
 ## Areas that detect pieces occupying lines. One for every line.
 var line_areas: Array[LineArea]
+# Internal counters.
 var n_lines_cleared := 0
 var round_tick_time := 1.0
 var round_tick_timer := 0.0
@@ -51,7 +53,6 @@ func move_down_rows(starting_row: int, n_rows: int):
 			movement_tween.tween_property(cell, "position", cell.position+Vector2(0,game_grid.cell_size.y*n_rows), 0.1)
 			movement_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 			#cell.position.y += game_grid.cell_size.y*n_rows
-			
 ## Checks the row numbers in [param check_rows] for line clears
 func line_clear_check(check_rows: Array[int]):
 	await get_tree().physics_frame
@@ -73,16 +74,29 @@ func line_clear_check(check_rows: Array[int]):
 			start_round()
 # Round Logic
 func round_tick():
-	player_tetromino.move(PlayerTetromino.MoveType.DOWN)
+	player_tetromino.move(PlayerTetromino.MoveType.TICK_DOWN)
 func start_round():
-	round_tick_time = (1+rounds-current_round)*round_speed
-	print(round_tick_time)
+	round_tick_time = round_speed_curve.sample(current_round)
 	round_text.text = str(current_round)
+func _physics_process(delta: float) -> void:
+	round_tick_timer += delta
+
+	if round_tick_timer >= round_tick_time:
+		round_tick()
+		round_tick_timer = 0
 # Setup
+func _ready():
+	create_new_player_tetromino()
+	create_line_areas()
+	# Start round.
+	start_round()
 func create_new_player_tetromino():
 	player_tetromino = PlayerTetromino.new(game_grid)
+	player_tetromino.key_down_speed = key_down_speed
+	player_tetromino.drop_delay = drop_delay
 	player_tetromino.connect("placed", piece_placed)
-	game_grid.add_item(player_tetromino, Vector2(0,8))
+	@warning_ignore("integer_division")
+	game_grid.add_item(player_tetromino, Vector2(0,floor(game_grid.grid_size.x/2)))
 func create_line_areas():
 	var line_rect = RectangleShape2D.new()
 	line_rect.set_size(Vector2(game_grid.cell_size.x*game_grid.grid_size.x-player_tetromino.hit_box_padding*2, 
@@ -98,17 +112,3 @@ func create_line_areas():
 		line_area.add_child(line_rect_cshape)
 		line_areas.append(line_area)
 		game_grid.add_child(line_area)
-# Overloaded Functions
-func _ready():
-	create_new_player_tetromino()
-	create_line_areas()
-	# Start round.
-	start_round()
-	
-func _physics_process(delta: float) -> void:
-	round_tick_timer += delta
-
-	if round_tick_timer >= round_tick_time:
-		round_tick()
-		round_tick_timer = 0
-		

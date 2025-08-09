@@ -39,6 +39,5 @@ vertical_alignment = 1
 script = ExtResource("6_a0mqw")
 game_grid = NodePath("../Grid")
 round_text = NodePath("../RoundText")
-round_speed = 0.1
 round_clears = 1
 metadata/_custom_type_script = "uid://3w2c5pohpila"
