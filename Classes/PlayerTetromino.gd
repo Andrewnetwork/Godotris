@@ -28,11 +28,23 @@ var force_drop_timer := 0.0
 
 var grid: Grid
 
+
+
 var drop_delay : float
 var key_down_speed : float
 var type : TetrominoType
 var cell_size : Vector2 
 
+# SFX
+var sfx_player := AudioStreamPlayer.new()
+var quick_drop_sound: AudioStream = preload("res://Sound/quick_drop.mp3")
+var regular_drop_sound: AudioStream = preload("res://Sound/regular_drop.mp3")
+
+
+
+func play_sound(sfx: AudioStream):
+	sfx_player.stream = sfx
+	sfx_player.play()
 # Placement Functions
 func dissolve():
 	## Dissolve the player tetromino into individual static body cells.
@@ -115,6 +127,8 @@ func make_cell(color: Color, cell_position: Vector2):
 	return c_shape
 func _ready():
 	_update_shadow()
+	# Player added to parent because the player piece is destroyed when placed. 
+	get_parent().add_child(sfx_player)
 # Shadow Functions
 func _stage_shadow():
 	shadow.modulate.a = 0.25
@@ -183,13 +197,16 @@ func move(move_flag: MoveType):
 							# A key is down and a force drop is initiated.
 							time_force_drop = true
 							if force_drop_timer >= drop_delay:
+								play_sound(regular_drop_sound)
 								place()
 						else:
+							play_sound(regular_drop_sound)
 							place()
 					else:
 						move_and_collide(Vector2(0, cell_size.y))
 				MoveType.DOWN:
 					if move_and_collide(Vector2(0, cell_size.y), true) != null:
+						play_sound(regular_drop_sound)
 						place()
 					else:
 						move_and_collide(Vector2(0, cell_size.y))
@@ -200,6 +217,7 @@ func move(move_flag: MoveType):
 					if move_and_collide(Vector2(cell_size.x, 0), true) == null:
 						position.x += cell_size.x
 				MoveType.DROP:
+					play_sound(quick_drop_sound)
 					var drop_pos = await get_drop_pos()
 					move_and_collide(Vector2(0, drop_pos.y))
 					place()

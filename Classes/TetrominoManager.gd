@@ -6,8 +6,9 @@ extends Node
 @export var game_grid: Grid
 ## Rich text label used to display the current round.
 @export var round_text: RichTextLabel
-
 @export var game_over_screen : Node2D
+@export var background_music_player : AudioStreamPlayer
+
 @export_group("Gameplay Settings")
 ## Number of rounds in the game.
 @export var rounds := 10
@@ -26,9 +27,17 @@ extends Node
 @export var drop_delay := 2
 
 #==== Game Settings ====
-@export_group("Settings")
+@export_group("General Settings")
 ## Current round. The initial value represents at what round the game begins.
 @export var current_round := 1
+
+#Sounds
+@export_group("Sound Effects")
+@export var line_clear_sound: AudioStream = preload("res://Sound/clear.mp3")
+var clear_1_sound: AudioStream = preload("res://Sound/clear_1.mp3")
+var clear_2_sound: AudioStream = preload("res://Sound/clear_2.mp3")
+var clear_3_sound: AudioStream = preload("res://Sound/clear_3.mp3")
+var clear_4_sound: AudioStream = preload("res://Sound/clear_4.mp3")
 
 ## The tetromino actively being moved by the player. 
 var player_tetromino: PlayerTetromino
@@ -38,11 +47,29 @@ var line_areas: Array[Area2D]
 var n_lines_cleared := 0
 var round_tick_time := 1.0
 var round_tick_timer := 0.0
+# Effect player
+var sfx_player := AudioStreamPlayer.new()
+var sfx_player2 := AudioStreamPlayer.new()
 
+func play_sound(sfx: AudioStream):
+	if !sfx_player.playing:
+		sfx_player.stream = sfx
+		sfx_player.play()
+	elif !sfx_player2.playing:
+		sfx_player2.stream = sfx
+		sfx_player2.play()
+	else:
+		push_error("No available audio stream players to play TetrominoManager SFX.")
+	
 func _on_invalid_placement():
 	game_over_screen.visible = true
+	background_music_player.stop()
+	var game_over_sound = preload("res://Sound/game_over.wav")
+	background_music_player.stream = game_over_sound
+	background_music_player.play()
 	# Stops the game loop.
 	set_physics_process(false)
+	player_tetromino.queue_free()
 func piece_placed(rows_affected: Array[int]):
 	await get_tree().physics_frame
 	line_clear_check(rows_affected)
@@ -68,9 +95,20 @@ func line_clear_check(check_rows: Array[int]):
 				cell.queue_free()
 			n_clears += 1
 	
-
 	if n_clears > 0:
 		n_lines_cleared += n_clears
+		# Play general line clear sound.
+		play_sound(line_clear_sound)
+		# Add additional sound effect indicating the number of clears.
+		if n_clears == 1:
+			play_sound(clear_1_sound)
+		elif n_clears == 2:
+			play_sound(clear_2_sound)
+		elif n_clears == 3:
+			play_sound(clear_3_sound)
+		elif n_clears == 4:
+			play_sound(clear_4_sound)
+			
 		move_down_rows(check_rows.max(), n_clears)
 		# Advance to next round.
 		if n_lines_cleared >= round_clears*current_round:
@@ -82,6 +120,7 @@ func round_tick():
 func start_round():
 	round_tick_time = round_speed_curve.sample(current_round)
 	round_text.text = str(current_round)
+	background_music_player.pitch_scale += 0.01
 func _physics_process(delta: float) -> void:
 	round_tick_timer += delta
 
@@ -92,6 +131,9 @@ func _physics_process(delta: float) -> void:
 func _ready():
 	create_new_player_tetromino()
 	create_line_areas()
+	sfx_player.max_polyphony = 5
+	add_child(sfx_player)
+	add_child(sfx_player2)
 	# Start round.
 	start_round()
 func create_new_player_tetromino():

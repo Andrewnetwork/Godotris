@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://d4bx8ncknyfkt"]
+[gd_scene load_steps=6 format=3 uid="uid://d4bx8ncknyfkt"]
 
 [ext_resource type="Script" uid="uid://b55a60dekqq8q" path="res://Classes/Grid.gd" id="1_nbu7d"]
 [ext_resource type="Shader" uid="uid://crf5wbpldvhi" path="res://Shaders/hrv_colorwheel.gdshader" id="4_23bm3"]
+[ext_resource type="AudioStream" uid="uid://chwseuj275sr2" path="res://Sound/Pixelland.mp3" id="4_ygsac"]
 [ext_resource type="Script" uid="uid://3w2c5pohpila" path="res://Classes/TetrominoManager.gd" id="6_a0mqw"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pt2ix"]
@@ -26,11 +27,12 @@ grid_color = Color(0.501961, 0.501961, 0.501961, 0.360784)
 background_color = Color(0, 0, 0, 1)
 metadata/_custom_type_script = "uid://b55a60dekqq8q"
 
-[node name="TetrominoManager" type="Node" parent="." node_paths=PackedStringArray("game_grid", "round_text", "game_over_screen")]
+[node name="TetrominoManager" type="Node" parent="." node_paths=PackedStringArray("game_grid", "round_text", "game_over_screen", "background_music_player")]
 script = ExtResource("6_a0mqw")
 game_grid = NodePath("../Grid")
 round_text = NodePath("../RoundText")
 game_over_screen = NodePath("../GameOverScreen")
+background_music_player = NodePath("../BackgroundMusic")
 round_clears = 1
 metadata/_custom_type_script = "uid://3w2c5pohpila"
 
@@ -79,5 +81,11 @@ offset_top = 440.0
 offset_right = 352.0
 offset_bottom = 471.0
 text = "Play Again"
+
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_ygsac")
+volume_db = -9.954
+autoplay = true
+parameters/looping = false
 
 [connection signal="pressed" from="GameOverScreen/PlayAgain" to="TetrominoManager" method="_on_play_again_pressed"]
