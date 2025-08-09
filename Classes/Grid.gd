@@ -8,8 +8,8 @@ extends Node2D
 @export var background_color : Color = Color(1.0,1.0,1.0,0.0) : set = set_background_color
 
 ## Adds node to the grid and positions it at the given position. 
-func add_item(grid_item: Node2D, cell_pos: Vector2):
-	grid_item.position = Vector2(cell_pos.y*cell_size.y-cell_size.y/2.0, cell_pos.x*cell_size.x+cell_size.x/2.0)
+func add_item(grid_item: Node2D, cell_pos: Vector2i):
+	grid_item.position = Vector2(cell_pos.x*cell_size.x+cell_size.x/2.0, cell_pos.y*cell_size.y-cell_size.y/2.0)
 	add_child(grid_item)
 # Setup
 func _init_grid_boundaries():

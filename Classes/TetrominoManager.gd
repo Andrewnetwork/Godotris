@@ -96,7 +96,7 @@ func create_new_player_tetromino():
 	player_tetromino.drop_delay = drop_delay
 	player_tetromino.connect("placed", piece_placed)
 	@warning_ignore("integer_division")
-	game_grid.add_item(player_tetromino, Vector2(0,floor(game_grid.grid_size.x/2)))
+	game_grid.add_item(player_tetromino, Vector2i(floor(game_grid.grid_size.x/2),2))
 func create_line_areas():
 	var line_rect = RectangleShape2D.new()
 	line_rect.set_size(Vector2(game_grid.cell_size.x*game_grid.grid_size.x-player_tetromino.hit_box_padding*2, 
