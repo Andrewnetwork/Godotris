@@ -11,8 +11,7 @@ void fragment() {
 	//COLOR = vec4(draw_function2(UV),0,0,1);
 	float noise = rand(UV+TIME);
 	COLOR.r += sin(UV.x*300.0)/20.0;
-	COLOR.g += sin(UV.y*300.0+TIME*50.0)/20.0;
-	COLOR.a -= noise/6.0;
+	COLOR.g += sin(UV.y*300.0+TIME*20.0)/20.0;
 }
 //void light() {
 //	// Called for every pixel for every light affecting the CanvasItem.

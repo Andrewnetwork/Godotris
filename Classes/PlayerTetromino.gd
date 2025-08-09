@@ -131,7 +131,7 @@ func _ready():
 	get_parent().add_child(sfx_player)
 # Shadow Functions
 func _stage_shadow():
-	shadow.modulate.a = 0.25
+	shadow.modulate.a = 0.4
 	grid.add_child(shadow)	
 func _update_shadow():
 	var drop_pos = await get_drop_pos()

@@ -1,12 +1,16 @@
-[gd_scene load_steps=6 format=3 uid="uid://d4bx8ncknyfkt"]
+[gd_scene load_steps=8 format=3 uid="uid://d4bx8ncknyfkt"]
 
 [ext_resource type="Script" uid="uid://b55a60dekqq8q" path="res://Classes/Grid.gd" id="1_nbu7d"]
+[ext_resource type="Shader" uid="uid://krdmegslhcx8" path="res://Shaders/crt.gdshader" id="4_6vf64"]
 [ext_resource type="Shader" uid="uid://crf5wbpldvhi" path="res://Shaders/hrv_colorwheel.gdshader" id="4_23bm3"]
 [ext_resource type="AudioStream" uid="uid://chwseuj275sr2" path="res://Sound/Pixelland.mp3" id="4_ygsac"]
 [ext_resource type="Script" uid="uid://3w2c5pohpila" path="res://Classes/TetrominoManager.gd" id="6_a0mqw"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pt2ix"]
 shader = ExtResource("4_23bm3")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_a0mqw"]
+shader = ExtResource("4_6vf64")
 
 [node name="ClassicGame" type="Node2D"]
 
@@ -19,44 +23,90 @@ offset_bottom = 800.0
 color = Color(0.0767263, 0.0696374, 0.0833809, 1)
 metadata/_edit_lock_ = true
 
-[node name="Grid" type="Node2D" parent="."]
-position = Vector2(104, 128)
+[node name="GameDisplay" type="Node2D" parent="."]
+position = Vector2(-3, 5)
+
+[node name="ColorRect" type="ColorRect" parent="GameDisplay"]
+modulate = Color(0, 0, 0, 1)
+material = SubResource("ShaderMaterial_a0mqw")
+offset_left = 93.0
+offset_top = 46.0
+offset_right = 466.0
+offset_bottom = 766.0
+color = Color(0, 0, 0, 1)
+
+[node name="Grid" type="Node2D" parent="GameDisplay"]
+position = Vector2(104, 55)
 script = ExtResource("1_nbu7d")
-grid_size = Vector2i(16, 24)
-grid_color = Color(0.501961, 0.501961, 0.501961, 0.360784)
+cell_size = Vector2(35, 35)
+grid_size = Vector2i(10, 20)
+grid_color = Color(0.89, 0.89, 0.89, 0.364706)
 background_color = Color(0, 0, 0, 1)
 metadata/_custom_type_script = "uid://b55a60dekqq8q"
 
+[node name="RoundUI" type="Node2D" parent="GameDisplay"]
+position = Vector2(-11, 0)
+
+[node name="RoundBG" type="ColorRect" parent="GameDisplay/RoundUI"]
+modulate = Color(0, 0, 0, 1)
+material = SubResource("ShaderMaterial_a0mqw")
+offset_left = 487.0
+offset_top = 46.0
+offset_right = 559.0
+offset_bottom = 110.0
+
+[node name="RoundNumber" type="RichTextLabel" parent="GameDisplay/RoundUI"]
+offset_left = 487.0
+offset_top = 72.0
+offset_right = 559.0
+offset_bottom = 110.0
+theme_override_font_sizes/normal_font_size = 19
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RoundLabel" type="RichTextLabel" parent="GameDisplay/RoundUI"]
+offset_left = 487.0
+offset_top = 46.0
+offset_right = 559.0
+offset_bottom = 73.0
+theme_override_font_sizes/normal_font_size = 16
+text = "ROUND"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NextPiece" type="Node2D" parent="GameDisplay"]
+position = Vector2(-11, 0)
+
+[node name="NextPieceBG" type="ColorRect" parent="GameDisplay/NextPiece"]
+modulate = Color(0, 0, 0, 1)
+material = SubResource("ShaderMaterial_a0mqw")
+offset_left = 487.0
+offset_top = 186.0
+offset_right = 559.0
+offset_bottom = 250.0
+metadata/_edit_use_anchors_ = true
+
+[node name="Node2D" type="Node2D" parent="GameDisplay"]
+position = Vector2(-11, 0)
+
+[node name="NextPieceBG2" type="ColorRect" parent="GameDisplay/Node2D"]
+modulate = Color(0, 0, 0, 1)
+material = SubResource("ShaderMaterial_a0mqw")
+offset_left = 487.0
+offset_top = 116.0
+offset_right = 559.0
+offset_bottom = 180.0
+metadata/_edit_use_anchors_ = true
+
 [node name="TetrominoManager" type="Node" parent="." node_paths=PackedStringArray("game_grid", "round_text", "game_over_screen", "background_music_player")]
 script = ExtResource("6_a0mqw")
-game_grid = NodePath("../Grid")
-round_text = NodePath("../RoundText")
+game_grid = NodePath("../GameDisplay/Grid")
+round_text = NodePath("../GameDisplay/RoundUI/RoundNumber")
 game_over_screen = NodePath("../GameOverScreen")
 background_music_player = NodePath("../BackgroundMusic")
 round_clears = 1
 metadata/_custom_type_script = "uid://3w2c5pohpila"
-
-[node name="ColorRect" type="ColorRect" parent="."]
-offset_left = 104.0
-offset_top = 72.0
-offset_right = 504.0
-offset_bottom = 128.0
-color = Color(0.262932, 0.262932, 0.262932, 1)
-
-[node name="RoundText" type="RichTextLabel" parent="."]
-offset_left = 480.0
-offset_top = 82.0
-offset_right = 501.0
-offset_bottom = 122.0
-text = "1"
-vertical_alignment = 1
-
-[node name="RichTextLabel" type="RichTextLabel" parent="."]
-offset_left = 414.0
-offset_top = 91.0
-offset_right = 486.0
-offset_bottom = 131.0
-text = "ROUND:"
 
 [node name="GameOverScreen" type="Node2D" parent="."]
 visible = false
@@ -67,18 +117,17 @@ offset_bottom = 800.0
 color = Color(0, 0, 0, 0.701961)
 
 [node name="RichTextLabel" type="RichTextLabel" parent="GameOverScreen"]
-offset_top = 368.0
 offset_right = 600.0
-offset_bottom = 440.0
+offset_bottom = 800.0
 theme_override_font_sizes/normal_font_size = 40
 text = "GAME OVER"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="PlayAgain" type="Button" parent="GameOverScreen"]
-offset_left = 264.0
+offset_left = 263.0
 offset_top = 440.0
-offset_right = 352.0
+offset_right = 351.0
 offset_bottom = 471.0
 text = "Play Again"
 
