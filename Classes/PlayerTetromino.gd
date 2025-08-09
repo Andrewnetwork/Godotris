@@ -32,28 +32,6 @@ var key_down_speed : float
 var type : TetrominoType
 var cell_size : Vector2 
 
-func make_cell(color: Color, cell_position: Vector2):
-	var sprite := Sprite2D.new()
-	var c_shape := CollisionShape2D.new()
-	var img = Image.create(1,1,false, Image.FORMAT_RGBA8)
-	
-	img.fill(color)
-	# Create a sprite and texture it with the above image. 
-	sprite.material = ShaderMaterial.new()
-	sprite.material.shader = load("res://Shaders/tetrino_cell.gdshader")
-	sprite.texture = ImageTexture.create_from_image(img)
-	sprite.scale = cell_size
- 	
-	# Add collsion shape. 
-	var rect_shape = RectangleShape2D.new()
-	# Make the collision shape a bit smaller so objects can be closer. 
-	rect_shape.size = Vector2(cell_size.x-hit_box_padding, cell_size.y-hit_box_padding) 
-
-	c_shape.shape = rect_shape
-	c_shape.position = cell_position
-
-	c_shape.add_child(sprite)
-	return c_shape
 # Placement Functions
 func dissolve():
 	## Dissolve the player tetromino into individual static body cells.
@@ -85,6 +63,8 @@ func _init(game_grid: Grid, tetromino_type:TetrominoType=PlayerTetromino.Tetromi
 	type = tetromino_type
 	cell_size = game_grid.cell_size
 	bounding_box.monitoring = true
+	bounding_box.visible = false
+	
 	grid = game_grid
 	_create()
 func _create():
@@ -102,17 +82,31 @@ func _create():
 					Vector2(column*cell_size.x, row*cell_size.y)-center_cell)
 				add_child(nt)
 				cells.append(nt)
+				bounding_box.add_child(nt.duplicate(false))
 				shadow.add_child(nt.duplicate(false))
-		
-	# A bounding box area for the whole tetromino. 
-	var bounding_box_rect = RectangleShape2D.new()
-	bounding_box_rect.set_size(Vector2(cell_size.x*n_cols-hit_box_padding, cell_size.y*n_rows-hit_box_padding))
-	var bounding_box_shape = CollisionShape2D.new()
-	bounding_box_shape.shape = bounding_box_rect
-	bounding_box_shape.position -= Vector2(0, cell_size.y/2)
-	bounding_box.add_child(bounding_box_shape)
 	add_child(bounding_box)
+func make_cell(color: Color, cell_position: Vector2):
+	var sprite := Sprite2D.new()
+	var c_shape := CollisionShape2D.new()
+	var img = Image.create(1,1,false, Image.FORMAT_RGBA8)
 	
+	img.fill(color)
+	# Create a sprite and texture it with the above image. 
+	sprite.material = ShaderMaterial.new()
+	sprite.material.shader = load("res://Shaders/tetrino_cell.gdshader")
+	sprite.texture = ImageTexture.create_from_image(img)
+	sprite.scale = cell_size
+ 	
+	# Add collsion shape. 
+	var rect_shape = RectangleShape2D.new()
+	# Make the collision shape a bit smaller so objects can be closer. 
+	rect_shape.size = Vector2(cell_size.x-hit_box_padding, cell_size.y-hit_box_padding) 
+
+	c_shape.shape = rect_shape
+	c_shape.position = cell_position
+
+	c_shape.add_child(sprite)
+	return c_shape
 func _ready():
 	_update_shadow()
 # Shadow Functions
@@ -171,6 +165,8 @@ func get_drop_pos():
 		return Vector2.ZERO
 # Character Movement 
 func move(move_flag: MoveType):
+	# Wait for all the physics to be processed before making a move.
+	await get_tree().physics_frame
 	match move_flag:
 		MoveType.TICK_DOWN:
 			if move_and_collide(Vector2(0, cell_size.y), true) != null:
