@@ -7,6 +7,7 @@ extends Node
 ## Rich text label used to display the current round.
 @export var round_text: RichTextLabel
 
+@export var game_over_screen : Node2D
 @export_group("Gameplay Settings")
 ## Number of rounds in the game.
 @export var rounds := 10
@@ -38,6 +39,10 @@ var n_lines_cleared := 0
 var round_tick_time := 1.0
 var round_tick_timer := 0.0
 
+func _on_invalid_placement():
+	game_over_screen.visible = true
+	# Stops the game loop.
+	set_physics_process(false)
 func piece_placed(rows_affected: Array[int]):
 	await get_tree().physics_frame
 	line_clear_check(rows_affected)
@@ -94,8 +99,9 @@ func create_new_player_tetromino():
 	player_tetromino.key_down_speed = key_down_speed
 	player_tetromino.drop_delay = drop_delay
 	player_tetromino.connect("placed", piece_placed)
+	player_tetromino.connect("invalid_placement", _on_invalid_placement)
 	@warning_ignore("integer_division")
-	game_grid.add_item(player_tetromino, Vector2i(floor(game_grid.grid_size.x/2),2))
+	game_grid.add_item(player_tetromino, Vector2i(floor(game_grid.grid_size.x/2),0))
 func create_line_areas():
 	var line_rect = RectangleShape2D.new()
 	line_rect.set_size(Vector2(game_grid.cell_size.x*game_grid.grid_size.x-player_tetromino.hit_box_padding*2, 
@@ -111,3 +117,6 @@ func create_line_areas():
 		line_area.add_child(line_rect_cshape)
 		line_areas.append(line_area)
 		game_grid.add_child(line_area)
+# UI
+func _on_play_again_pressed() -> void:
+	get_tree().reload_current_scene()

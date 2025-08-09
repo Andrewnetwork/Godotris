@@ -14,9 +14,9 @@ func add_item(grid_item: Node2D, cell_pos: Vector2i):
 # Setup
 func _init_grid_boundaries():
 	#[pos, normal]
+	# [Vector2(0,0), Vector2.DOWN]
 	var boundary_positions = [[Vector2(0,grid_size.y*cell_size.y), Vector2.UP], 
-		[Vector2(0,0), Vector2.DOWN], [Vector2(0,0), Vector2.RIGHT], 
-		[Vector2(grid_size.x*cell_size.x,0), Vector2.LEFT]]
+		[Vector2(0,0), Vector2.RIGHT], [Vector2(grid_size.x*cell_size.x,0), Vector2.LEFT]]
 	
 	for boundary_position in boundary_positions:
 		var static_body = StaticBody2D.new()

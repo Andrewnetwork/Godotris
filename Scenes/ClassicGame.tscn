@@ -26,18 +26,58 @@ grid_color = Color(0.501961, 0.501961, 0.501961, 0.360784)
 background_color = Color(0, 0, 0, 1)
 metadata/_custom_type_script = "uid://b55a60dekqq8q"
 
-[node name="RoundText" type="RichTextLabel" parent="."]
-offset_left = 464.0
-offset_top = 88.0
-offset_right = 504.0
-offset_bottom = 128.0
-text = "1"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="TetrominoManager" type="Node" parent="." node_paths=PackedStringArray("game_grid", "round_text")]
+[node name="TetrominoManager" type="Node" parent="." node_paths=PackedStringArray("game_grid", "round_text", "game_over_screen")]
 script = ExtResource("6_a0mqw")
 game_grid = NodePath("../Grid")
 round_text = NodePath("../RoundText")
+game_over_screen = NodePath("../GameOverScreen")
 round_clears = 1
 metadata/_custom_type_script = "uid://3w2c5pohpila"
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = 104.0
+offset_top = 72.0
+offset_right = 504.0
+offset_bottom = 128.0
+color = Color(0.262932, 0.262932, 0.262932, 1)
+
+[node name="RoundText" type="RichTextLabel" parent="."]
+offset_left = 480.0
+offset_top = 82.0
+offset_right = 501.0
+offset_bottom = 122.0
+text = "1"
+vertical_alignment = 1
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+offset_left = 414.0
+offset_top = 91.0
+offset_right = 486.0
+offset_bottom = 131.0
+text = "ROUND:"
+
+[node name="GameOverScreen" type="Node2D" parent="."]
+visible = false
+
+[node name="BG" type="ColorRect" parent="GameOverScreen"]
+offset_right = 600.0
+offset_bottom = 800.0
+color = Color(0, 0, 0, 0.701961)
+
+[node name="RichTextLabel" type="RichTextLabel" parent="GameOverScreen"]
+offset_top = 368.0
+offset_right = 600.0
+offset_bottom = 440.0
+theme_override_font_sizes/normal_font_size = 40
+text = "GAME OVER"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlayAgain" type="Button" parent="GameOverScreen"]
+offset_left = 264.0
+offset_top = 440.0
+offset_right = 352.0
+offset_bottom = 471.0
+text = "Play Again"
+
+[connection signal="pressed" from="GameOverScreen/PlayAgain" to="TetrominoManager" method="_on_play_again_pressed"]

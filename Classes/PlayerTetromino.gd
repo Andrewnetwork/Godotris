@@ -2,6 +2,7 @@ class_name PlayerTetromino
 extends CharacterBody2D
 
 signal placed(rows_affected: Array[int])
+signal invalid_placement()
 
 enum MoveType {TICK_DOWN, DOWN, LEFT, RIGHT, UP, DROP}
 enum TetrominoType {I, O, T, S, Z, J, L}
@@ -48,16 +49,21 @@ func dissolve():
 func place(place_position: Vector2 = self.position):
 	## Place the tetromino, dissolve the character body, and return the index of the rows affected 
 	## by the placement. 
-	var rows_affected : Array[int] = []
-	for cell in cells:
-		var row_idx =  int(ceil((position.y+cell.position.rotated(rotation).y) / cell_size.y))-1
-		if not rows_affected.has(row_idx):
-			rows_affected.append(row_idx)
-	position = place_position
-	if is_instance_valid(shadow):
-			shadow.queue_free()
-	dissolve()
-	emit_signal("placed", rows_affected)
+	if self.position.y < cell_size.y:
+		#Game over.
+		emit_signal("invalid_placement")
+	else:
+		var rows_affected : Array[int] = []
+		for cell in cells:
+			var row_idx =  int(ceil((position.y+cell.position.rotated(rotation).y) / cell_size.y))-1
+			if not rows_affected.has(row_idx):
+				rows_affected.append(row_idx)
+		position = place_position
+		if is_instance_valid(shadow):
+				shadow.queue_free()
+		dissolve()
+		emit_signal("placed", rows_affected)
+		
 # Setup
 func _init(game_grid: Grid, tetromino_type:TetrominoType=PlayerTetromino.TetrominoType.values()[randi_range(0,6)]):
 	type = tetromino_type
@@ -111,7 +117,7 @@ func _ready():
 	_update_shadow()
 # Shadow Functions
 func _stage_shadow():
-	shadow.modulate.a = 0.5
+	shadow.modulate.a = 0.25
 	grid.add_child(shadow)	
 func _update_shadow():
 	var drop_pos = await get_drop_pos()
@@ -208,7 +214,7 @@ func safe_rotate():
 		# Wait for all physics calculations to be completed before checking
 		# for collisions with bounding box. 
 		await get_tree().physics_frame
-		# Get all of the bodies colliding with the bounding box. 
+		# Get all of the bodies colliding with the bounding box. S
 		rotation_collisions = bounding_box.get_overlapping_bodies()
 		# Remove the tetromino, which is within the bounding box. 
 		rotation_collisions.erase(self)
