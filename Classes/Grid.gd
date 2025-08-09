@@ -2,10 +2,10 @@
 class_name Grid
 extends Node2D
 
-@export var cell_size: Vector2 = Vector2(25, 25)
-@export var grid_size: Vector2 = Vector2(20, 15)
-@export var grid_color: Color = Color(0.5, 0.5, 0.5)
-@export var background_color : Color = Color(1.0,1.0,1.0,0.0)
+@export var cell_size: Vector2 = Vector2(25, 25) : set = set_cell_size
+@export var grid_size := Vector2i(20, 15) : set = set_grid_size
+@export var grid_color: Color = Color(0.5, 0.5, 0.5) : set = set_grid_color
+@export var background_color : Color = Color(1.0,1.0,1.0,0.0) : set = set_background_color
 
 ## Adds node to the grid and positions it at the given position. 
 func add_item(grid_item: Node2D, cell_pos: Vector2):
@@ -27,9 +27,23 @@ func _init_grid_boundaries():
 		world_boundary.shape = world_boundary_shape
 		static_body.add_child(world_boundary)
 		add_child(static_body)
+# Getters and Setters
+func set_cell_size(new_cell_size: Vector2):
+	cell_size = new_cell_size
+	queue_redraw()
+func set_grid_size(new_grid_size: Vector2):
+	grid_size = new_grid_size
+	queue_redraw()
+func set_grid_color(new_grid_color: Color):
+	grid_color = new_grid_color
+	queue_redraw()
+func set_background_color(new_background_color: Color):
+	background_color = new_background_color
+	queue_redraw()
 # Overloaded Functions
 func _ready():
-	_init_grid_boundaries()
+	if !Engine.is_editor_hint():
+		_init_grid_boundaries()
 func _draw():
 	# Background
 	draw_rect(Rect2(Vector2(0.0, 0.0), 

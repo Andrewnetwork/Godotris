@@ -3,7 +3,7 @@ extends CharacterBody2D
 
 signal placed(rows_affected: Array[int])
 
-enum MoveType {DOWN, LEFT, RIGHT, UP, STILL, DROP}
+enum MoveType {DOWN, LEFT, RIGHT, UP, DROP}
 enum TetrominoType {I, O, T, S, Z, J, L}
 const tetromino_definition = {
 	TetrominoType.I: {"block_mask":[1,1,1,1], "n_rows":1, "n_cols":4, "color": Color.CYAN},
@@ -17,8 +17,6 @@ const tetromino_definition = {
 
 var type : TetrominoType
 var cell_size : Vector2 
-var move_flag : MoveType = MoveType.STILL
-var is_frozen = false
 var timer = 0
 var shadow : Node2D = Node2D.new()
 var cells : Array[TetrominoCellShape]
@@ -26,6 +24,8 @@ const hit_box_padding = 0.05
 var bounding_box : Area2D = Area2D.new()
 var rotation_collisions : Array[Node2D]
 var grid: Grid
+var key_down_speed := 0.1
+var key_down_timer := 0.0
 
 # Placement Functions
 func dissolve():
@@ -49,7 +49,8 @@ func place(place_position: Vector2 = self.position):
 		if not rows_affected.has(row_idx):
 			rows_affected.append(row_idx)
 	position = place_position
-	is_frozen = true 
+	if is_instance_valid(shadow):
+			shadow.queue_free()
 	dissolve()
 	emit_signal("placed", rows_affected)
 # Setup
@@ -128,10 +129,30 @@ func get_drop_pos():
 		print("error")
 		return Vector2.ZERO
 # Character Movement functions. 
-func move(move_type: MoveType):
-	# Disregard movement when dropping a piece. 
-	if move_flag != MoveType.DROP:
-		move_flag = move_type	
+func move(move_flag: MoveType):
+	var piece_placed:= false
+	match move_flag:
+		MoveType.DOWN:
+			if move_and_collide(Vector2(0, cell_size.y), true) != null:
+				place()
+				piece_placed = true
+			else:
+				move_and_collide(Vector2(0, cell_size.y))
+		MoveType.LEFT:
+			if move_and_collide(Vector2(-cell_size.x, 0), true) == null:
+				position.x -= cell_size.x
+		MoveType.RIGHT:
+			if move_and_collide(Vector2(cell_size.x, 0), true) == null:
+				position.x += cell_size.x
+		MoveType.DROP:
+			move_and_collide(Vector2(0, get_drop_pos().y))
+			place()
+			piece_placed = true
+		MoveType.UP:
+			safe_rotate()
+	#Now that we've finished updating the location, update the shadow.
+	if !piece_placed:
+		_update_shadow()
 func safe_rotate():
 	# Rotate the bounding box to test for rotation collisions. 
 	bounding_box.rotate(deg_to_rad(90))
@@ -166,50 +187,69 @@ func _unhandled_input(event: InputEvent):
 		move(MoveType.DROP)
 	elif event.is_action_pressed("ui_up"):
 		move(MoveType.UP)
+#func _physics_process(delta: float):
+	#timer += delta 
+	#if Input.is_physical_key_pressed(KEY_LEFT) && timer > 0.05:
+		#move_flag = MoveType.LEFT
+		#timer = 0
+	#elif Input.is_physical_key_pressed(KEY_RIGHT) && timer > 0.05:
+		#move_flag = MoveType.RIGHT
+		#timer = 0
+	#elif Input.is_physical_key_pressed(KEY_DOWN) && timer > 0.02:
+		#move_flag = MoveType.DOWN
+		#timer = 0
+		#
+	#if !is_frozen:
+		#match move_flag:
+			#MoveType.STILL:
+				#pass
+			#MoveType.DOWN:
+				#if move_and_collide(Vector2(0, cell_size.y), true) != null:
+					#is_frozen = true
+					#place()
+				#else:
+					#position.y += cell_size.y
+				#move_flag = MoveType.STILL	 
+			#MoveType.LEFT:
+				#if move_and_collide(Vector2(-cell_size.x, 0), true) == null:
+					#position.x -= cell_size.x
+				#move_flag = MoveType.STILL	 
+			#MoveType.RIGHT:
+				#if move_and_collide(Vector2(cell_size.x, 0), true) == null:
+					#position.x += cell_size.x
+				#move_flag = MoveType.STILL 
+			#MoveType.DROP:
+				#position.y += get_drop_pos().y
+				#place()
+				## Set the flags to prevent further movement of this piece. 
+				#is_frozen = true
+				#move_flag = MoveType.STILL	 
+			#MoveType.UP:
+				#safe_rotate()
+				#move_flag = MoveType.STILL 
+	##Now that we've finished updating the location, update the shadow.
+	#if !is_frozen:
+		#_update_shadow()
+	#else:
+		## If this tetromino has been frozen in place, queue its shadow for deletion.
+		#if is_instance_valid(shadow):
+			#shadow.queue_free()
 func _physics_process(delta: float):
-	timer += delta 
-	if Input.is_physical_key_pressed(KEY_LEFT) && timer > 0.05:
-		move_flag = MoveType.LEFT
-		timer = 0
-	elif Input.is_physical_key_pressed(KEY_RIGHT) && timer > 0.05:
-		move_flag = MoveType.RIGHT
-		timer = 0
-	elif Input.is_physical_key_pressed(KEY_DOWN) && timer > 0.02:
-		move_flag = MoveType.DOWN
-		timer = 0
-		
-	if !is_frozen:
-		match move_flag:
-			MoveType.STILL:
-				pass
-			MoveType.DOWN:
-				if move_and_collide(Vector2(0, cell_size.y), true) != null:
-					is_frozen = true
-					place()
-				else:
-					position.y += cell_size.y
-				move_flag = MoveType.STILL	 
-			MoveType.LEFT:
-				if move_and_collide(Vector2(-cell_size.x, 0), true) == null:
-					position.x -= cell_size.x
-				move_flag = MoveType.STILL	 
-			MoveType.RIGHT:
-				if move_and_collide(Vector2(cell_size.x, 0), true) == null:
-					position.x += cell_size.x
-				move_flag = MoveType.STILL 
-			MoveType.DROP:
-				position.y += get_drop_pos().y
-				place()
-				# Set the flags to prevent further movement of this piece. 
-				is_frozen = true
-				move_flag = MoveType.STILL	 
-			MoveType.UP:
-				safe_rotate()
-				move_flag = MoveType.STILL 
-	#Now that we've finished updating the location, update the shadow.
-	if !is_frozen:
-		_update_shadow()
+	if Input.is_physical_key_pressed(KEY_LEFT):
+		key_down_timer += delta
+		if key_down_timer >= key_down_speed:
+			move(PlayerTetromino.MoveType.LEFT)
+			key_down_timer = 0
+	elif Input.is_physical_key_pressed(KEY_RIGHT):
+		key_down_timer += delta
+		if key_down_timer >= key_down_speed:
+			move(PlayerTetromino.MoveType.RIGHT)
+			key_down_timer = 0
+	elif Input.is_physical_key_pressed(KEY_DOWN):
+		key_down_timer += delta
+		if key_down_timer >= key_down_speed:
+			move(PlayerTetromino.MoveType.DOWN)
+			key_down_timer = 0
 	else:
-		# If this tetromino has been frozen in place, queue its shadow for deletion.
-		if is_instance_valid(shadow):
-			shadow.queue_free()
+		# No key is being pressed, reset timer. 
+		key_down_timer = 0

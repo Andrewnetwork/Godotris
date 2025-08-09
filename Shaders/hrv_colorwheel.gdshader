@@ -13,8 +13,8 @@ void fragment() {
 
     // Use polar coordinates instead of cartesian
     vec2 toCenter = vec2(0.5)-UV;
-    float angle = atan(toCenter.y,toCenter.x)+TIME;
-    float radius = length(toCenter)*10.0+sin(TIME*3.0);
+    float angle = atan(toCenter.y,toCenter.x)+TIME/2.0;
+    float radius = length(toCenter)*10.0+sin(TIME*6.0);
 
     // Map the angle (-PI to PI) to the Hue (from 0 to 1)
     // and the Saturation to the radius
