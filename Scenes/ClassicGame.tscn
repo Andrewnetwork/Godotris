@@ -36,6 +36,7 @@ offset_bottom = 766.0
 color = Color(0, 0, 0, 1)
 
 [node name="Grid" type="Node2D" parent="GameDisplay"]
+clip_children = 2
 position = Vector2(104, 55)
 script = ExtResource("1_nbu7d")
 cell_size = Vector2(35, 35)

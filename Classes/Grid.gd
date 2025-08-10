@@ -42,6 +42,8 @@ func set_background_color(new_background_color: Color):
 	queue_redraw()
 # Overloaded Functions
 func _ready():
+	# Clipping hides the player tetromino spawn.
+	clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
 	if !Engine.is_editor_hint():
 		_init_grid_boundaries()
 func _draw():

@@ -90,6 +90,7 @@ func line_clear_check(check_rows: Array[int]):
 	var n_clears = 0
 	for row_idx in check_rows:
 		var cells_in_line = line_areas[row_idx].get_overlapping_bodies()
+		
 		if len(cells_in_line) == game_grid.grid_size.x:
 			for cell in cells_in_line:
 				cell.queue_free()
