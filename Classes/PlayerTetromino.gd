@@ -40,7 +40,7 @@ var sfx_player := AudioStreamPlayer.new()
 var quick_drop_sound: AudioStream = preload("res://Sound/quick_drop.mp3")
 var regular_drop_sound: AudioStream = preload("res://Sound/regular_drop.mp3")
 
-
+var flattened:= Node2D.new()
 
 func play_sound(sfx: AudioStream):
 	sfx_player.stream = sfx
@@ -75,7 +75,9 @@ func place(place_position: Vector2 = self.position):
 				shadow.queue_free()
 		dissolve()
 		emit_signal("placed", rows_affected)
-		
+func destroy():
+	shadow.queue_free()
+	queue_free()
 # Setup
 func _init(game_grid: Grid, tetromino_type:TetrominoType=PlayerTetromino.TetrominoType.values()[randi_range(0,6)]):
 	type = tetromino_type
@@ -100,6 +102,7 @@ func _create():
 					Vector2(column*cell_size.x, row*cell_size.y)-center_cell)
 				add_child(nt)
 				cells.append(nt)
+				flattened.add_child(nt.duplicate(false))
 				bounding_box.add_child(nt.duplicate(false))
 				shadow.add_child(nt.duplicate(false))
 	add_child(bounding_box)
@@ -122,7 +125,7 @@ func make_cell(color: Color, cell_position: Vector2):
 
 	c_shape.shape = rect_shape
 	c_shape.position = cell_position
-
+	
 	c_shape.add_child(sprite)
 	return c_shape
 func _ready():
@@ -254,6 +257,7 @@ func _unhandled_input(event: InputEvent):
 		move(MoveType.DROP)
 	elif event.is_action_pressed("ui_up"):
 		move(MoveType.UP)
+# Processes movement while key is down. 
 func _physics_process(delta: float):
 	if time_force_drop:
 		force_drop_timer += delta

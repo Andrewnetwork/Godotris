@@ -5,9 +5,11 @@ extends Node
 ## Game grid where pieces are placed and moved. 
 @export var game_grid: Grid
 ## Rich text label used to display the current round.
+@export var held_piece: Node2D
 @export var round_text: RichTextLabel
 @export var game_over_screen : Node2D
 @export var background_music_player : AudioStreamPlayer
+@export var animation_player: AnimationPlayer
 
 @export_group("Gameplay Settings")
 ## Number of rounds in the game.
@@ -26,30 +28,36 @@ extends Node
 ## The ammount of time in seconds before a drop is forced while moving a piece.
 @export var drop_delay := 2
 
-#==== Game Settings ====
+#=== Game Settings
 @export_group("General Settings")
 ## Current round. The initial value represents at what round the game begins.
 @export var current_round := 1
 
-#Sounds
+#=== Sounds
 @export_group("Sound Effects")
+@export var error_sound: AudioStream = preload("res://Sound/error.wav")
 @export var line_clear_sound: AudioStream = preload("res://Sound/clear.mp3")
-var clear_1_sound: AudioStream = preload("res://Sound/clear_1.mp3")
-var clear_2_sound: AudioStream = preload("res://Sound/clear_2.mp3")
-var clear_3_sound: AudioStream = preload("res://Sound/clear_3.mp3")
-var clear_4_sound: AudioStream = preload("res://Sound/clear_4.mp3")
+@export var clear_1_sound: AudioStream = preload("res://Sound/clear_1.mp3")
+@export var clear_2_sound: AudioStream = preload("res://Sound/clear_2.mp3")
+@export var clear_3_sound: AudioStream = preload("res://Sound/clear_3.mp3")
+@export var clear_4_sound: AudioStream = preload("res://Sound/clear_4.mp3")
 
-## The tetromino actively being moved by the player. 
-var player_tetromino: PlayerTetromino
-## Areas that detect pieces occupying lines. One for every line.
-var line_areas: Array[Area2D]
-# Internal counters.
-var n_lines_cleared := 0
-var round_tick_time := 1.0
-var round_tick_timer := 0.0
+
 # Effect player
 var sfx_player := AudioStreamPlayer.new()
 var sfx_player2 := AudioStreamPlayer.new()
+## Areas that detect pieces occupying lines. One for every line.
+var line_areas: Array[Area2D]
+#=== Internal counters.
+var n_lines_cleared := 0
+var round_tick_time := 1.0
+var round_tick_timer := 0.0
+#=== Game States
+var held_tetromino = null
+var held_this_turn = false
+## The tetromino actively being moved by the player. 
+var player_tetromino: PlayerTetromino
+
 
 func play_sound(sfx: AudioStream):
 	if !sfx_player.playing:
@@ -137,12 +145,13 @@ func _ready():
 	add_child(sfx_player2)
 	# Start round.
 	start_round()
-func create_new_player_tetromino():
-	player_tetromino = PlayerTetromino.new(game_grid)
+func create_new_player_tetromino(tetromino_type: PlayerTetromino.TetrominoType=PlayerTetromino.TetrominoType.values()[randi_range(0,6)]):
+	player_tetromino = PlayerTetromino.new(game_grid, tetromino_type)
 	player_tetromino.key_down_speed = key_down_speed
 	player_tetromino.drop_delay = drop_delay
 	player_tetromino.connect("placed", piece_placed)
 	player_tetromino.connect("invalid_placement", _on_invalid_placement)
+	held_this_turn = false
 	@warning_ignore("integer_division")
 	game_grid.add_item(player_tetromino, Vector2i(floor(game_grid.grid_size.x/2),0))
 func create_line_areas():
@@ -160,6 +169,34 @@ func create_line_areas():
 		line_area.add_child(line_rect_cshape)
 		line_areas.append(line_area)
 		game_grid.add_child(line_area)
+# Control
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("hold"):
+		if !held_this_turn:
+			var current_tetromino_type = player_tetromino.type
+			player_tetromino.destroy()
+			if held_tetromino == null:
+				held_tetromino = current_tetromino_type
+				create_new_player_tetromino()
+			else:
+				create_new_player_tetromino(held_tetromino)
+				held_tetromino = current_tetromino_type
+			display_new_hold()
+			held_this_turn=true
+		else:
+			# Can only store in or swap with hold once per turn.
+			animation_player.play("thumb_down_shake_hold")
+			play_sound(error_sound)
+		
 # UI
+func display_new_hold():
+	#TODO: make more efficient and fix off centered positioning. 
+	for child in held_piece.get_children():
+		if child is Node2D:
+			held_piece.remove_child(child)
+			break
+	var flat_hold_image = PlayerTetromino.new(game_grid, held_tetromino).flattened
+	flat_hold_image.scale = Vector2(0.4,0.4)
+	held_piece.add_child(flat_hold_image)
 func _on_play_again_pressed() -> void:
 	get_tree().reload_current_scene()

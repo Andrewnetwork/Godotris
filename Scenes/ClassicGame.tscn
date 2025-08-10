@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://d4bx8ncknyfkt"]
+[gd_scene load_steps=12 format=3 uid="uid://d4bx8ncknyfkt"]
 
 [ext_resource type="Script" uid="uid://b55a60dekqq8q" path="res://Classes/Grid.gd" id="1_nbu7d"]
 [ext_resource type="Shader" uid="uid://krdmegslhcx8" path="res://Shaders/crt.gdshader" id="4_6vf64"]
 [ext_resource type="Shader" uid="uid://crf5wbpldvhi" path="res://Shaders/hrv_colorwheel.gdshader" id="4_23bm3"]
+[ext_resource type="Texture2D" uid="uid://bsc1lgqbl76ut" path="res://Sprite/thumb_down.png" id="4_a0mqw"]
 [ext_resource type="AudioStream" uid="uid://chwseuj275sr2" path="res://Sound/Pixelland.mp3" id="4_ygsac"]
 [ext_resource type="Script" uid="uid://3w2c5pohpila" path="res://Classes/TetrominoManager.gd" id="6_a0mqw"]
 
@@ -11,6 +12,67 @@ shader = ExtResource("4_23bm3")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_a0mqw"]
 shader = ExtResource("4_6vf64")
+
+[sub_resource type="Animation" id="Animation_23bm3"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_a0mqw"]
+resource_name = "thumb_down_shake"
+length = 3.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0333333, 0.0666667, 0.1, 0.133333, 0.166667, 0.2, 0.233333, 0.266667, 0.3, 0.333333, 0.366667, 0.4, 0.433333, 0.466667, 0.5, 0.533333, 0.566667, 0.6, 0.633333, 0.666667, 0.7, 0.733333, 0.766667, 0.8, 0.833333, 0.866667, 0.9, 0.933333, 0.966667, 1, 1.03333, 1.06667, 1.1, 1.13333, 1.16667, 1.2, 1.23333, 1.26667, 1.3, 1.33333, 1.36667, 1.4, 1.43333, 1.46667, 1.5, 1.53333, 1.56667, 1.6, 1.63333, 1.66667, 1.7, 1.73333, 1.76667, 1.8, 1.83333, 1.86667, 1.9, 1.93333, 1.96667, 2, 2.03333, 2.06667, 2.1, 2.13333, 2.16667, 2.2, 2.23333, 2.26667, 2.3, 2.33333, 2.36667, 2.4, 2.43333, 2.46667, 2.5, 2.53333, 2.56667, 2.6, 2.63333, 2.66667, 2.7, 2.73333, 2.76667, 2.8, 2.83333, 2.86667, 2.9, 2.93333, 2.96667, 3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.0, 0.0179987, 0.0359974, 0.0539961, 0.0719948, 0.0899935, 0.107992, 0.125991, 0.14399, 0.161988, 0.179987, 0.197986, 0.215984, 0.233983, 0.251982, 0.269981, 0.287979, 0.267409, 0.246839, 0.226269, 0.2057, 0.18513, 0.16456, 0.14399, 0.12342, 0.10285, 0.0822798, 0.0617099, 0.0411399, 0.02057, -5.60914e-17, 0.0168409, 0.0336818, 0.0505227, 0.0673636, 0.0842045, 0.101045, 0.117886, 0.134727, 0.151568, 0.168409, 0.18525, 0.202091, 0.218932, 0.235773, 0.252613, 0.269454, 0.286295, 0.268344, 0.246528, 0.224711, 0.202895, 0.181078, 0.159261, 0.137445, 0.115628, 0.0938114, 0.0719948, 0.0501782, 0.0283616, 0.00654498, 0.0131755, 0.0319977, 0.0508199, 0.0696421, 0.0884642, 0.107286, 0.126109, 0.144931, 0.163753, 0.182575, 0.201397, 0.22022, 0.239042, 0.257864, 0.276686, 0.279447, 0.258115, 0.236783, 0.215451, 0.194119, 0.172788, 0.151456, 0.130124, 0.108792, 0.0874604, 0.0661286, 0.0447968, 0.023465, 0.0021332, 0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.0333333, 0.0666667, 0.1, 0.133333, 0.166667, 0.2, 0.233333, 0.266667, 0.3, 0.333333, 0.366667, 0.4, 0.433333, 0.466667, 0.5, 0.533333, 0.566667, 0.6, 0.633333, 0.666667, 0.7, 0.733333, 0.766667, 0.8, 0.833333, 0.866667, 0.9, 0.933333, 0.966667, 1, 1.03333, 1.06667, 1.1, 1.13333, 1.16667, 1.2, 1.23333, 1.26667, 1.3, 1.33333, 1.36667, 1.4, 1.43333, 1.46667, 1.5, 1.53333, 1.56667, 1.6, 1.63333, 1.66667, 1.7, 1.73333, 1.76667, 1.8, 1.83333, 1.86667, 1.9, 1.93333, 1.96667, 2, 2.03333, 2.06667, 2.1, 2.13333, 2.16667, 2.2, 2.23333, 2.26667, 2.3, 2.33333, 2.36667, 2.4, 2.43333, 2.46667, 2.5, 2.53333, 2.56667, 2.6, 2.63333, 2.66667, 2.7, 2.73333, 2.76667, 2.8, 2.83333, 2.86667, 2.9, 2.93333, 2.96667, 3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0.0952381), Color(1, 1, 1, 0.190476), Color(1, 1, 1, 0.285714), Color(1, 1, 1, 0.380952), Color(1, 1, 1, 0.476191), Color(1, 1, 1, 0.571429), Color(1, 1, 1, 0.666667), Color(1, 1, 1, 0.761905), Color(1, 1, 1, 0.857143), Color(1, 1, 1, 0.952381), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0.933333), Color(1, 1, 1, 0.866667), Color(1, 1, 1, 0.8), Color(1, 1, 1, 0.733333), Color(1, 1, 1, 0.666667), Color(1, 1, 1, 0.6), Color(1, 1, 1, 0.533333), Color(1, 1, 1, 0.466667), Color(1, 1, 1, 0.4), Color(1, 1, 1, 0.333333), Color(1, 1, 1, 0.266667), Color(1, 1, 1, 0.2), Color(1, 1, 1, 0.133333), Color(1, 1, 1, 0.0666667), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_23bm3"]
+_data = {
+&"RESET": SubResource("Animation_23bm3"),
+&"thumb_down_shake_hold": SubResource("Animation_a0mqw")
+}
 
 [node name="ClassicGame" type="Node2D"]
 
@@ -37,7 +99,7 @@ color = Color(0, 0, 0, 1)
 
 [node name="Grid" type="Node2D" parent="GameDisplay"]
 clip_children = 2
-position = Vector2(104, 55)
+position = Vector2(105, 55)
 script = ExtResource("1_nbu7d")
 cell_size = Vector2(35, 35)
 grid_size = Vector2i(10, 20)
@@ -45,67 +107,132 @@ grid_color = Color(0.89, 0.89, 0.89, 0.364706)
 background_color = Color(0, 0, 0, 1)
 metadata/_custom_type_script = "uid://b55a60dekqq8q"
 
-[node name="RoundUI" type="Node2D" parent="GameDisplay"]
+[node name="SideUI" type="Node2D" parent="GameDisplay"]
+
+[node name="RoundUI" type="Node2D" parent="GameDisplay/SideUI"]
 position = Vector2(-11, 0)
 
-[node name="RoundBG" type="ColorRect" parent="GameDisplay/RoundUI"]
-modulate = Color(0, 0, 0, 1)
+[node name="RoundTextBG" type="ColorRect" parent="GameDisplay/SideUI/RoundUI"]
+modulate = Color(0, 0, 0, 0.568627)
 material = SubResource("ShaderMaterial_a0mqw")
 offset_left = 487.0
 offset_top = 46.0
 offset_right = 559.0
-offset_bottom = 110.0
+offset_bottom = 74.0
 
-[node name="RoundNumber" type="RichTextLabel" parent="GameDisplay/RoundUI"]
+[node name="RoundBG" type="ColorRect" parent="GameDisplay/SideUI/RoundUI"]
+modulate = Color(0, 0, 0, 1)
+material = SubResource("ShaderMaterial_a0mqw")
 offset_left = 487.0
-offset_top = 72.0
+offset_top = 74.0
 offset_right = 559.0
-offset_bottom = 110.0
-theme_override_font_sizes/normal_font_size = 19
+offset_bottom = 138.0
+
+[node name="RoundNumber" type="RichTextLabel" parent="GameDisplay/SideUI/RoundUI"]
+offset_left = 487.0
+offset_top = 74.0
+offset_right = 559.0
+offset_bottom = 138.0
+theme_override_font_sizes/normal_font_size = 31
 text = "1"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="RoundLabel" type="RichTextLabel" parent="GameDisplay/RoundUI"]
+[node name="RoundLabel" type="RichTextLabel" parent="GameDisplay/SideUI/RoundUI"]
 offset_left = 487.0
 offset_top = 46.0
 offset_right = 559.0
-offset_bottom = 73.0
+offset_bottom = 74.0
 theme_override_font_sizes/normal_font_size = 16
 text = "ROUND"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="NextPiece" type="Node2D" parent="GameDisplay"]
-position = Vector2(-11, 0)
+[node name="NextPiece" type="Node2D" parent="GameDisplay/SideUI"]
+position = Vector2(-12, 29)
 
-[node name="NextPieceBG" type="ColorRect" parent="GameDisplay/NextPiece"]
+[node name="NextPieceBG2" type="ColorRect" parent="GameDisplay/SideUI/NextPiece"]
 modulate = Color(0, 0, 0, 1)
 material = SubResource("ShaderMaterial_a0mqw")
-offset_left = 487.0
-offset_top = 186.0
-offset_right = 559.0
-offset_bottom = 250.0
+offset_left = 488.0
+offset_top = 144.0
+offset_right = 560.0
+offset_bottom = 208.0
 metadata/_edit_use_anchors_ = true
 
-[node name="Node2D" type="Node2D" parent="GameDisplay"]
-position = Vector2(-11, 0)
-
-[node name="NextPieceBG2" type="ColorRect" parent="GameDisplay/Node2D"]
-modulate = Color(0, 0, 0, 1)
+[node name="RoundTextBG" type="ColorRect" parent="GameDisplay/SideUI/NextPiece"]
+modulate = Color(0, 0, 0, 0.568627)
 material = SubResource("ShaderMaterial_a0mqw")
-offset_left = 487.0
+offset_left = 488.0
 offset_top = 116.0
-offset_right = 559.0
-offset_bottom = 180.0
+offset_right = 560.0
+offset_bottom = 144.0
 metadata/_edit_use_anchors_ = true
 
-[node name="TetrominoManager" type="Node" parent="." node_paths=PackedStringArray("game_grid", "round_text", "game_over_screen", "background_music_player")]
+[node name="NextPieceLabel" type="RichTextLabel" parent="GameDisplay/SideUI/NextPiece"]
+offset_left = 488.0
+offset_top = 115.0
+offset_right = 560.0
+offset_bottom = 143.0
+theme_override_font_sizes/normal_font_size = 16
+text = "NEXT"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Hold" type="Node2D" parent="GameDisplay/SideUI"]
+position = Vector2(512, 310)
+
+[node name="RoundTextBG" type="ColorRect" parent="GameDisplay/SideUI/Hold"]
+modulate = Color(0, 0, 0, 0.568627)
+material = SubResource("ShaderMaterial_a0mqw")
+offset_left = -36.0
+offset_top = -66.0
+offset_right = 36.0
+offset_bottom = -38.0
+metadata/_edit_use_anchors_ = true
+
+[node name="HoldLabel" type="RichTextLabel" parent="GameDisplay/SideUI/Hold"]
+offset_left = -36.0
+offset_top = -67.0
+offset_right = 36.0
+offset_bottom = -39.0
+theme_override_font_sizes/normal_font_size = 16
+text = "HOLD"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="HoldBg" type="ColorRect" parent="GameDisplay/SideUI/Hold"]
+modulate = Color(0, 0, 0, 1)
+show_behind_parent = true
+material = SubResource("ShaderMaterial_a0mqw")
+offset_left = -36.0
+offset_top = -38.0
+offset_right = 36.0
+offset_bottom = 26.0
+metadata/_edit_use_anchors_ = true
+
+[node name="ThumbDown" type="Sprite2D" parent="."]
+modulate = Color(1, 1, 1, 0)
+position = Vector2(509, 307)
+scale = Vector2(0.0552996, 0.0552996)
+texture = ExtResource("4_a0mqw")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+root_node = NodePath("../ThumbDown")
+libraries = {
+&"": SubResource("AnimationLibrary_23bm3")
+}
+
+[node name="TetrominoManager" type="Node" parent="." node_paths=PackedStringArray("game_grid", "held_piece", "round_text", "game_over_screen", "background_music_player", "animation_player")]
 script = ExtResource("6_a0mqw")
 game_grid = NodePath("../GameDisplay/Grid")
-round_text = NodePath("../GameDisplay/RoundUI/RoundNumber")
+held_piece = NodePath("../GameDisplay/SideUI/Hold")
+round_text = NodePath("../GameDisplay/SideUI/RoundUI/RoundNumber")
 game_over_screen = NodePath("../GameOverScreen")
 background_music_player = NodePath("../BackgroundMusic")
+animation_player = NodePath("../AnimationPlayer")
 round_clears = 1
 metadata/_custom_type_script = "uid://3w2c5pohpila"
 
