@@ -3,3 +3,5 @@ Licensed under Creative Commons: By Attribution 4.0 License
 http://creativecommons.org/licenses/by/4.0/
 
 Life Lost Game Over by noirenex -- https://freesound.org/s/159408/ -- License: Creative Commons 0
+
+VS Button Click 04.mp3 by Vilkas_Sound -- https://freesound.org/s/707041/ -- License: Attribution 4.0

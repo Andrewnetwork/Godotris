@@ -41,6 +41,7 @@ extends Node
 @export var clear_2_sound: AudioStream = preload("res://Sound/clear_2.mp3")
 @export var clear_3_sound: AudioStream = preload("res://Sound/clear_3.mp3")
 @export var clear_4_sound: AudioStream = preload("res://Sound/clear_4.mp3")
+@export var hold_click: AudioStream = preload("res://Sound/hold_click.mp3")
 
 
 # Effect player
@@ -191,6 +192,7 @@ func _unhandled_input(event: InputEvent) -> void:
 # UI
 func display_new_hold():
 	#TODO: make more efficient and fix off centered positioning. 
+	play_sound(hold_click)
 	for child in held_piece.get_children():
 		if child is Node2D:
 			held_piece.remove_child(child)
