@@ -76,19 +76,20 @@ _data = {
 
 [node name="ClassicGame" type="Node2D"]
 
-[node name="BG" type="ColorRect" parent="."]
-self_modulate = Color(0, 0, 0, 1)
-material = SubResource("ShaderMaterial_pt2ix")
-offset_top = 3.05176e-05
-offset_right = 600.0
-offset_bottom = 800.0
-color = Color(0.0767263, 0.0696374, 0.0833809, 1)
-metadata/_edit_lock_ = true
-
 [node name="GameDisplay" type="Node2D" parent="."]
 position = Vector2(-3, 5)
 
-[node name="ColorRect" type="ColorRect" parent="GameDisplay"]
+[node name="BG" type="ColorRect" parent="GameDisplay"]
+self_modulate = Color(0, 0, 0, 1)
+material = SubResource("ShaderMaterial_pt2ix")
+offset_left = 3.0
+offset_top = -4.99997
+offset_right = 603.0
+offset_bottom = 795.0
+color = Color(0.0767263, 0.0696374, 0.0833809, 1)
+metadata/_edit_lock_ = true
+
+[node name="GridBG" type="ColorRect" parent="GameDisplay"]
 modulate = Color(0, 0, 0, 1)
 material = SubResource("ShaderMaterial_a0mqw")
 offset_left = 93.0
@@ -149,36 +150,33 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="NextPiece" type="Node2D" parent="GameDisplay/SideUI"]
-position = Vector2(-12, 29)
+position = Vector2(476, 174)
 
 [node name="NextPieceBG2" type="ColorRect" parent="GameDisplay/SideUI/NextPiece"]
 modulate = Color(0, 0, 0, 1)
 material = SubResource("ShaderMaterial_a0mqw")
-offset_left = 488.0
-offset_top = 144.0
-offset_right = 560.0
-offset_bottom = 208.0
+offset_right = 72.0
+offset_bottom = 64.0
 metadata/_edit_use_anchors_ = true
 
 [node name="RoundTextBG" type="ColorRect" parent="GameDisplay/SideUI/NextPiece"]
 modulate = Color(0, 0, 0, 0.568627)
 material = SubResource("ShaderMaterial_a0mqw")
-offset_left = 488.0
-offset_top = 116.0
-offset_right = 560.0
-offset_bottom = 144.0
+offset_top = -28.0
+offset_right = 72.0
 metadata/_edit_use_anchors_ = true
 
 [node name="NextPieceLabel" type="RichTextLabel" parent="GameDisplay/SideUI/NextPiece"]
-offset_left = 488.0
-offset_top = 115.0
-offset_right = 560.0
-offset_bottom = 143.0
+offset_top = -28.0
+offset_right = 72.0
 theme_override_font_sizes/normal_font_size = 16
 text = "NEXT"
 horizontal_alignment = 1
 vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
+
+[node name="NextPieceSpawn" type="Node2D" parent="GameDisplay/SideUI/NextPiece"]
+position = Vector2(36, 32)
 
 [node name="Hold" type="Node2D" parent="GameDisplay/SideUI"]
 position = Vector2(512, 310)
@@ -213,27 +211,48 @@ offset_right = 36.0
 offset_bottom = 26.0
 metadata/_edit_use_anchors_ = true
 
-[node name="ThumbDown" type="Sprite2D" parent="."]
+[node name="HoldSpawn" type="Node2D" parent="GameDisplay/SideUI/Hold"]
+
+[node name="PressC" type="Node2D" parent="GameDisplay/SideUI/Hold/HoldSpawn"]
+
+[node name="PressCText" type="RichTextLabel" parent="GameDisplay/SideUI/Hold/HoldSpawn/PressC"]
+offset_left = -36.0
+offset_top = -38.0
+offset_right = 36.0
+offset_bottom = 26.0
+text = "Press C"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ThumbDown" type="Sprite2D" parent="GameDisplay/SideUI/Hold"]
 modulate = Color(1, 1, 1, 0)
-position = Vector2(509, 307)
+position = Vector2(0, -8)
 scale = Vector2(0.0552996, 0.0552996)
 texture = ExtResource("4_a0mqw")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-root_node = NodePath("../ThumbDown")
+[node name="Engine" type="Node" parent="."]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Engine"]
+root_node = NodePath("../../GameDisplay/SideUI/Hold/ThumbDown")
 libraries = {
 &"": SubResource("AnimationLibrary_23bm3")
 }
 
-[node name="TetrominoManager" type="Node" parent="." node_paths=PackedStringArray("game_grid", "held_piece", "round_text", "game_over_screen", "background_music_player", "animation_player")]
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="Engine"]
+stream = ExtResource("4_ygsac")
+volume_db = -9.954
+autoplay = true
+parameters/looping = false
+
+[node name="TetrominoManager" type="Node" parent="Engine" node_paths=PackedStringArray("game_grid", "held_piece", "next_piece", "round_text", "game_over_screen", "background_music_player", "animation_player")]
 script = ExtResource("6_a0mqw")
-game_grid = NodePath("../GameDisplay/Grid")
-held_piece = NodePath("../GameDisplay/SideUI/Hold")
-round_text = NodePath("../GameDisplay/SideUI/RoundUI/RoundNumber")
-game_over_screen = NodePath("../GameOverScreen")
+game_grid = NodePath("../../GameDisplay/Grid")
+held_piece = NodePath("../../GameDisplay/SideUI/Hold/HoldSpawn")
+next_piece = NodePath("../../GameDisplay/SideUI/NextPiece/NextPieceSpawn")
+round_text = NodePath("../../GameDisplay/SideUI/RoundUI/RoundNumber")
+game_over_screen = NodePath("../../GameOverScreen")
 background_music_player = NodePath("../BackgroundMusic")
 animation_player = NodePath("../AnimationPlayer")
-round_clears = 1
 metadata/_custom_type_script = "uid://3w2c5pohpila"
 
 [node name="GameOverScreen" type="Node2D" parent="."]
@@ -259,10 +278,4 @@ offset_right = 351.0
 offset_bottom = 471.0
 text = "Play Again"
 
-[node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("4_ygsac")
-volume_db = -9.954
-autoplay = true
-parameters/looping = false
-
-[connection signal="pressed" from="GameOverScreen/PlayAgain" to="TetrominoManager" method="_on_play_again_pressed"]
+[connection signal="pressed" from="GameOverScreen/PlayAgain" to="Engine/TetrominoManager" method="_on_play_again_pressed"]

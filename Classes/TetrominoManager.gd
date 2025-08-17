@@ -6,6 +6,7 @@ extends Node
 @export var game_grid: Grid
 ## Rich text label used to display the current round.
 @export var held_piece: Node2D
+@export var next_piece: Node2D
 @export var round_text: RichTextLabel
 @export var game_over_screen : Node2D
 @export var background_music_player : AudioStreamPlayer
@@ -42,34 +43,33 @@ extends Node
 @export var clear_3_sound: AudioStream = preload("res://Sound/clear_3.mp3")
 @export var clear_4_sound: AudioStream = preload("res://Sound/clear_4.mp3")
 @export var hold_click: AudioStream = preload("res://Sound/hold_click.mp3")
-
+var olivia_dmu_1: AudioStream = preload("res://Sound/Olivia/olivia_dmu_1.mp3")
+var olivia_dmu_2: AudioStream = preload("res://Sound/Olivia/olivia_dmu_2.mp3")
+var olivia_dmu_3: AudioStream = preload("res://Sound/Olivia/olivia_dmu_3.mp3")
+var olivia_dmu_4: AudioStream = preload("res://Sound/Olivia/olivia_dmu_4.mp3")
 
 # Effect player
 var sfx_player := AudioStreamPlayer.new()
 var sfx_player2 := AudioStreamPlayer.new()
+var sfx_player3 := AudioStreamPlayer.new()
+var sfx_player4 := AudioStreamPlayer.new()
+var voice_player := AudioStreamPlayer.new()
+
 ## Areas that detect pieces occupying lines. One for every line.
 var line_areas: Array[Area2D]
 #=== Internal counters.
 var n_lines_cleared := 0
 var round_tick_time := 1.0
 var round_tick_timer := 0.0
+#=== Objects
+var nemesis_giraffe := preload("res://Objects/giraffe.tscn")
 #=== Game States
 var held_tetromino = null
 var held_this_turn = false
+var next_tetromino: PlayerTetromino.TetrominoType = PlayerTetromino.TetrominoType.values()[randi_range(0,6)]
 ## The tetromino actively being moved by the player. 
 var player_tetromino: PlayerTetromino
 
-
-func play_sound(sfx: AudioStream):
-	if !sfx_player.playing:
-		sfx_player.stream = sfx
-		sfx_player.play()
-	elif !sfx_player2.playing:
-		sfx_player2.stream = sfx
-		sfx_player2.play()
-	else:
-		push_error("No available audio stream players to play TetrominoManager SFX.")
-	
 func _on_invalid_placement():
 	game_over_screen.visible = true
 	background_music_player.stop()
@@ -122,15 +122,29 @@ func line_clear_check(check_rows: Array[int]):
 		move_down_rows(check_rows.max(), n_clears)
 		# Advance to next round.
 		if n_lines_cleared >= round_clears*current_round:
-			current_round += 1
-			start_round()
+			start_next_round()
+func nemesis_attack():
+	match randi_range(1,4):
+		1: play_sound(olivia_dmu_1, true)
+		2: play_sound(olivia_dmu_2, true)
+		3: play_sound(olivia_dmu_3, true)
+		4: play_sound(olivia_dmu_4, true)
+	
+		
+	var giraffe = nemesis_giraffe.instantiate()
+	@warning_ignore("integer_division")
+	game_grid.add_item(giraffe, Vector2i(floor(game_grid.grid_size.x/2),3))
+			
 # Round Logic
 func round_tick():
 	player_tetromino.move(PlayerTetromino.MoveType.TICK_DOWN)
-func start_round():
-	round_tick_time = round_speed_curve.sample(current_round)
+func start_next_round():
+	current_round += 1
 	round_text.text = str(current_round)
 	background_music_player.pitch_scale += 0.01
+	#nemesis_attack()
+	#if (randi() % 2):
+		#nemesis_attack()
 func _physics_process(delta: float) -> void:
 	round_tick_timer += delta
 
@@ -141,12 +155,18 @@ func _physics_process(delta: float) -> void:
 func _ready():
 	create_new_player_tetromino()
 	create_line_areas()
-	sfx_player.max_polyphony = 5
 	add_child(sfx_player)
 	add_child(sfx_player2)
-	# Start round.
-	start_round()
-func create_new_player_tetromino(tetromino_type: PlayerTetromino.TetrominoType=PlayerTetromino.TetrominoType.values()[randi_range(0,6)]):
+	add_child(sfx_player3)
+	add_child(sfx_player4)
+	add_child(voice_player)
+	voice_player.bus = "Voice"
+	round_text.text = str(current_round)
+func create_new_player_tetromino(tetromino_type = null):
+	if tetromino_type == null:
+		tetromino_type = next_tetromino
+		next_tetromino = PlayerTetromino.TetrominoType.values()[randi_range(0,6)]
+		display_new_next()
 	player_tetromino = PlayerTetromino.new(game_grid, tetromino_type)
 	player_tetromino.key_down_speed = key_down_speed
 	player_tetromino.drop_delay = drop_delay
@@ -190,6 +210,32 @@ func _unhandled_input(event: InputEvent) -> void:
 			play_sound(error_sound)
 		
 # UI
+func play_sound(sfx: AudioStream, use_voice_buffer := false):
+	if use_voice_buffer:
+		voice_player.stream = sfx
+		voice_player.play()
+	elif !sfx_player.playing:
+		sfx_player.stream = sfx
+		sfx_player.play()
+	elif !sfx_player2.playing:
+		sfx_player2.stream = sfx
+		sfx_player2.play()
+	elif !sfx_player3.playing:
+		sfx_player3.stream = sfx
+		sfx_player3.play()
+	elif !sfx_player4.playing:
+		sfx_player4.stream = sfx
+		sfx_player4.play()
+	else:
+		push_warning( "No available audio stream players to play TetrominoManager SFX.")
+func display_new_next():
+	for child in next_piece.get_children():
+		if child is Node2D:
+			next_piece.remove_child(child)
+			break
+	var flat_next_image = PlayerTetromino.new(game_grid, next_tetromino).flattened
+	flat_next_image.scale = Vector2(0.4,0.4)
+	next_piece.add_child(flat_next_image)
 func display_new_hold():
 	#TODO: make more efficient and fix off centered positioning. 
 	play_sound(hold_click)
@@ -202,3 +248,5 @@ func display_new_hold():
 	held_piece.add_child(flat_hold_image)
 func _on_play_again_pressed() -> void:
 	get_tree().reload_current_scene()
+
+	round_tick_time = round_speed_curve.sample(current_round)
